@@ -1,27 +1,50 @@
-# LeafletDemo
+# Leaflet
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.6.
+> Leaflet is the leading open-source JavaScript library for mobile-friendly interactive maps.
 
-## Development server
+## Why using it?
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+* It's community is big [(600+ contributers)](https://github.com/Leaflet/Leaflet/graphs/contributors) and well alive [(~ weekly commits)](https://github.com/Leaflet/Leaflet/pulse).
+* The [API reference](https://leafletjs.com/reference) is a bliss.
+* There are tons of useful [plugins](https://leafletjs.com/plugins.html).
+* Depending on the displayed map it doesn't require an outside connection.
+* It's free and open source: [BSD 2-Clause license](https://github.com/Leaflet/Leaflet/blob/master/LICENSE).
 
-## Code scaffolding
+## How does it work?
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+You define a DIV-tag as map and add various layers to it in javascript/typescript: [quick start tutorial](https://leafletjs.com/examples/quick-start/).
 
-## Build
+There are two kinds of layers:
+* Baselayers -> They work as the background. Only one at a time can be visible.
+* Overlaylayers -> They work as the foreground. Any number of them can be visible. They can be arranged hierarchically to achive the desired look of the displyed features.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Many subclasses of layers exist to serve different purposes: [architecture](https://leafletjs.com/examples/extending/extending-1-classes.html).
 
-## Running unit tests
+## But my map is not a Mercator projection!
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* [Non-geographical maps tutorial](https://leafletjs.com/examples/crs-simple/crs-simple.html)
+* [Zoom levels](https://leafletjs.com/examples/zoom-levels/)
 
-## Running end-to-end tests
+## Which plugins could be of interest?
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### [Edit geometries](https://leafletjs.com/plugins.html#edit-geometries)
 
-## Further help
+* [Leaflet.Editable](https://github.com/Leaflet/Leaflet.Editable) -> [Live demo](http://leaflet.github.io/Leaflet.Editable/example/index.html)
+* [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+### [Heatmaps](https://leafletjs.com/plugins.html#heatmaps)
+
+* [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat) -> [Live demo](http://leaflet.github.io/Leaflet.heat/demo/)
+* [heatmap.js](https://www.patrick-wied.at/static/heatmapjs/example-heatmap-leaflet.html)
+
+### [Clustering/Decluttering](https://leafletjs.com/plugins.html#clusteringdecluttering)
+
+* [Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster) -> [Live demo](https://leaflet.github.io/Leaflet.markercluster/example/marker-clustering-realworld.388.html)
+* [Leaflet.LayerGroup.Collision](https://github.com/MazeMap/Leaflet.LayerGroup.Collision) -> [Live demo](http://mazemap.github.io/Leaflet.LayerGroup.Collision/demo/demo.html)
+
+
+## Further readings
+
+* [leafletjs.com](https://leafletjs.com/)
+* [leafletjs.com/reference.html](https://leafletjs.com/reference.html)
+* [leafletjs.com/plugins.html](https://leafletjs.com/plugins.html)
