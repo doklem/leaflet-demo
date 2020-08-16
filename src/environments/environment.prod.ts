@@ -40,7 +40,12 @@ export const environment: IEnvironment = {
   worker:
   {
     moveDelay: 500,
-    peopleCount: 250,
+    peopleBatchSize: 10,
+    peopleLifetimeAddition: 60000,
+    peopleMinCount: 250,
+    peopleMinLifetime: 60000,
+    rotationMaxRadius: 0.005,
+    rotationTime: 60000,
     spreadRadius: 0.01,
     startLocation:
     {
