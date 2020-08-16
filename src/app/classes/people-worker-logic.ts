@@ -1,16 +1,16 @@
-import { PeopleWorkerOptions } from './people-worker-options';
 import { IPerson } from '../interfaces/iperson';
+import { IPeopleWorkerOptions } from '../interfaces/ipeople-worker-options';
 
 export class PeopleWorkerLogic {
 
-    private options: PeopleWorkerOptions;
+    private options: IPeopleWorkerOptions;
     private timeoutId: number;
 
     constructor() {
         this.timeoutId = 0;
     }
 
-    public initialize(options: PeopleWorkerOptions): void {
+    public initialize(options: IPeopleWorkerOptions): void {
         this.options = options;
         this.movePeople();
     }

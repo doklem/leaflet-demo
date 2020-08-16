@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   Circle, circle, CircleMarkerOptions, latLng, LayerGroup, layerGroup,
-  MapOptions, Polyline, polyline, PolylineOptions, tileLayer
+  MapOptions, Polyline, polyline, tileLayer
 } from 'leaflet';
 import { LeafletControlLayersConfig } from '@asymmetrik/ngx-leaflet';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
 import { IPerson } from '../../interfaces/iperson';
 import { Gender } from '../../enums/gender.enum';
@@ -15,12 +16,6 @@ import { Gender } from '../../enums/gender.enum';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnDestroy, OnInit {
-
-  private static readonly BASE_LAYER_OPTIONS = { maxZoom: 19, attribution: '...' };
-  private static readonly FEMALE_PERSON_LAYER_OPTIONS: CircleMarkerOptions = { radius: 5, weight: 0, fillColor: 'pink', fillOpacity: 0.6 };
-  private static readonly MALE_PERSON_LAYER_OPTIONS: CircleMarkerOptions = { radius: 5, weight: 0, fillColor: 'blue', fillOpacity: 0.6 };
-  private static readonly OTHER_PERSON_LAYER_OPTIONS: CircleMarkerOptions = { radius: 5, weight: 0, fillColor: 'green', fillOpacity: 0.6 };
-  private static readonly TRAILS_LAYER_OPTIONS: PolylineOptions = { weight: 1, color: 'red', opacity: 0.3 };
 
   private readonly peopleIdLookUp: { [personId: number]: number };
   private readonly peopleLayer: LayerGroup;
@@ -39,8 +34,8 @@ export class MapComponent implements OnDestroy, OnInit {
     this.trailsLayer = layerGroup();
     this.layersControl = {
       baseLayers: {
-        'Open Street Map': tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', MapComponent.BASE_LAYER_OPTIONS),
-        'Open Cycle Map': tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', MapComponent.BASE_LAYER_OPTIONS)
+        'Open Street Map': tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', environment.map.baseLayers),
+        'Open Cycle Map': tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', environment.map.baseLayers)
       },
       overlays: {
         People: this.peopleLayer,
@@ -52,8 +47,8 @@ export class MapComponent implements OnDestroy, OnInit {
         this.layersControl.baseLayers['Open Street Map'],
         this.layersControl.overlays.People
       ],
-      zoom: 17,
-      center: PeopleService.START_LOCATION
+      zoom: environment.map.initialZoom,
+      center: environment.map.startLocation
     };
   }
 
@@ -89,20 +84,20 @@ export class MapComponent implements OnDestroy, OnInit {
     let options: CircleMarkerOptions;
     switch (person.gender) {
       case Gender.FEMALE:
-        options = MapComponent.FEMALE_PERSON_LAYER_OPTIONS;
+        options = environment.map.femalePersonLayer;
         break;
       case Gender.MALE:
-        options = MapComponent.MALE_PERSON_LAYER_OPTIONS;
+        options = environment.map.malePersonLayer;
         break;
       default:
-        options = MapComponent.OTHER_PERSON_LAYER_OPTIONS;
+        options = environment.map.otherPersonLayer;
         break;
     }
     const dot = circle(latLng(person.trail[0]), options);
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
     this.peopleIdLookUp[person.id] = this.peopleLayer.getLayerId(dot);
-    const line = polyline(person.trail, MapComponent.TRAILS_LAYER_OPTIONS);
+    const line = polyline(person.trail, environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
     this.trailsIdLookUp[person.id] = this.trailsLayer.getLayerId(line);
   }
