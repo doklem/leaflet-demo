@@ -9,7 +9,7 @@ export const environment: IEnvironment = {
     femalePersonLayer: {
       radius: 5,
       weight: 0,
-      fillColor: 'pink',
+      fillColor: 'red',
       fillOpacity: 0.6
     },
     initialZoom: 17,
@@ -45,7 +45,7 @@ export const environment: IEnvironment = {
     peopleMinCount: 250,
     peopleMinLifetime: 60000,
     rotationMaxRadius: 0.005,
-    rotationTime: 60000,
+    rotationTime: 240000,
     spreadRadius: 0.01,
     startLocation:
     {
