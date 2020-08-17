@@ -67,7 +67,6 @@ export class MapComponent implements OnDestroy, OnInit {
     }
     return `<div><b>Id</b> ${person.id}</div>
     <div><b>Gender</b> ${genderText}</div>
-    <div><b>Length</b> ${person.trail.length}</div>
     <div><b>ETA</b> ${new Date(person.eta).toLocaleTimeString()}</div>`;
   }
 
@@ -93,17 +92,20 @@ export class MapComponent implements OnDestroy, OnInit {
         options = environment.map.otherPersonLayer;
         break;
     }
-    const dot = circle(latLng(person.trail[0]), options);
+    const location = latLng(person.location);
+    const dot = circle(location, options);
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
     this.peopleIdLookUp[person.id] = this.peopleLayer.getLayerId(dot);
-    const line = polyline(person.trail, environment.map.trailsLayer);
+    const line = polyline([location], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
     this.trailsIdLookUp[person.id] = this.trailsLayer.getLayerId(line);
   }
 
   private removePerson(personId: number): void {
     let layer = this.peopleLayer.getLayer(this.peopleIdLookUp[personId]);
+    layer.closePopup();
+    layer.unbindPopup();
     this.peopleLayer.removeLayer(layer);
     layer.remove();
     delete this.peopleIdLookUp[personId];
@@ -130,10 +132,10 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   private updatePerson(personLayerId: number, person: IPerson): void {
+    const location = latLng(person.location);
     const dot = this.peopleLayer.getLayer(personLayerId) as Circle;
-    dot.setLatLng(latLng(person.trail[0]));
-    dot.setPopupContent(MapComponent.getPopupContent(person));
+    dot.setLatLng(location);
     const line = this.trailsLayer.getLayer(this.trailsIdLookUp[person.id]) as Polyline;
-    line.setLatLngs(person.trail.map(location => latLng(location)));
+    line.addLatLng(location);
   }
 }

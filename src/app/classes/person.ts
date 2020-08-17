@@ -4,7 +4,7 @@ import { IPerson } from '../interfaces/iperson';
 
 export class Person implements IPerson {
 
-    public readonly trail: Array<ILocation>;
+    public readonly location: ILocation;
 
     constructor(
         public readonly id: number,
@@ -14,6 +14,10 @@ export class Person implements IPerson {
         public readonly rotationCenter: ILocation,
         public readonly rotationDirection: boolean,
         public readonly rotationRadius: number) {
-        this.trail = [];
+        this.location =
+        {
+            lat: 0,
+            lng: 0
+        };
     }
 }

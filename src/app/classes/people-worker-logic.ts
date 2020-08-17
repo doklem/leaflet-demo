@@ -17,16 +17,12 @@ export class PeopleWorkerLogic {
     }
 
     private static setLocation(person: Person, radians: number): void {
-        const location = {
-            lat: person.rotationCenter.lat + (Math.sin(radians + person.radianOffset) * person.rotationRadius),
-            lng: 0
-        };
+        person.location.lat = person.rotationCenter.lat + (Math.sin(radians + person.radianOffset) * person.rotationRadius);
         if (person.rotationDirection) {
-            location.lng = person.rotationCenter.lng - (Math.cos(radians + person.radianOffset) * person.rotationRadius);
+            person.location.lng = person.rotationCenter.lng - (Math.cos(radians + person.radianOffset) * person.rotationRadius);
         } else {
-            location.lng = person.rotationCenter.lng + (Math.cos(radians + person.radianOffset) * person.rotationRadius);
+            person.location.lng = person.rotationCenter.lng + (Math.cos(radians + person.radianOffset) * person.rotationRadius);
         }
-        person.trail.unshift(location);
     }
 
     private static toIPerson(person: Person): IPerson {
@@ -34,7 +30,7 @@ export class PeopleWorkerLogic {
             eta: person.eta,
             gender: person.gender,
             id: person.id,
-            trail: person.trail
+            location: person.location
         };
     }
 

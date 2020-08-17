@@ -39,7 +39,7 @@ export const environment: IEnvironment = {
   production: true,
   worker:
   {
-    moveDelay: 100,
+    moveDelay: 50,
     peopleBatchSize: 10,
     peopleLifetimeAddition: 60000,
     peopleMinCount: 250,

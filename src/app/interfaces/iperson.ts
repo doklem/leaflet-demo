@@ -5,5 +5,5 @@ export interface IPerson {
     readonly eta: number;
     readonly gender: Gender;
     readonly id: number;
-    readonly trail: Array<ILocation>;
+    readonly location: ILocation;
 }
