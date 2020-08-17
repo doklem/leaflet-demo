@@ -19,7 +19,7 @@ You define a DIV-tag as map and add various layers to it in javascript/typescrip
 There are two kinds of layers:
 
 * Baselayers -> They work as the background. Only one at a time can be visible.
-* Overlaylayers -> They work as the foreground. Any number of them can be visible. They can be arranged hierarchically to achive the desired look of the displyed features.
+* Overlaylayers -> They work as the foreground. Any number of them can be visible. They can be arranged hierarchically to achive the desired look of the displayed features.
 
 Many subclasses of layers exist to serve different purposes: [architecture](https://leafletjs.com/examples/extending/extending-1-classes.html).
 
