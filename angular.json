@@ -36,6 +36,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "https://doklem.github.io/leaflet-demo/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -124,8 +125,13 @@
               "devServerTarget": "leaflet-demo:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {}
         }
       }
-    }},
+    }
+  },
   "defaultProject": "leaflet-demo"
 }
