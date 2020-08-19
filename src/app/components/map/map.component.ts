@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   Circle, circle, CircleMarkerOptions, latLng, LayerGroup, layerGroup,
-  MapOptions, Polyline, polyline, tileLayer
+  MapOptions, Polyline, polyline, tileLayer, LatLng
 } from 'leaflet';
 import { LeafletControlLayersConfig } from '@asymmetrik/ngx-leaflet';
 import { Subscription } from 'rxjs';
@@ -17,9 +17,9 @@ import { Gender } from '../../enums/gender.enum';
 })
 export class MapComponent implements OnDestroy, OnInit {
 
-  private readonly peopleIdLookUp: { [personId: number]: number };
+  private readonly peopleLookUp: { [personId: number]: Circle };
   private readonly peopleLayer: LayerGroup;
-  private readonly trailsIdLookUp: { [personId: number]: number };
+  private readonly trailsLookUp: { [personId: number]: Polyline };
   private readonly trailsLayer: LayerGroup;
 
   private peopleSubscription: Subscription;
@@ -28,9 +28,9 @@ export class MapComponent implements OnDestroy, OnInit {
   public readonly options: MapOptions;
 
   constructor(private peopleService: PeopleService) {
-    this.peopleIdLookUp = {};
+    this.peopleLookUp = {};
     this.peopleLayer = layerGroup();
-    this.trailsIdLookUp = {};
+    this.trailsLookUp = {};
     this.trailsLayer = layerGroup();
     this.layersControl = {
       baseLayers: {
@@ -96,46 +96,53 @@ export class MapComponent implements OnDestroy, OnInit {
     const dot = circle(location, options);
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
-    this.peopleIdLookUp[person.id] = this.peopleLayer.getLayerId(dot);
-    const line = polyline([location], environment.map.trailsLayer);
+    this.peopleLookUp[person.id] = dot;
+    const line = polyline([location, location.clone()], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
-    this.trailsIdLookUp[person.id] = this.trailsLayer.getLayerId(line);
+    this.trailsLookUp[person.id] = line;
   }
 
   private removePerson(personId: number): void {
-    let layer = this.peopleLayer.getLayer(this.peopleIdLookUp[personId]);
-    layer.closePopup();
-    layer.unbindPopup();
-    this.peopleLayer.removeLayer(layer);
-    layer.remove();
-    delete this.peopleIdLookUp[personId];
-    layer = this.trailsLayer.getLayer(this.trailsIdLookUp[personId]);
-    this.trailsLayer.removeLayer(layer);
-    layer.remove();
-    delete this.trailsIdLookUp[personId];
+    const dot = this.peopleLookUp[personId];
+    dot.closePopup();
+    dot.unbindPopup();
+    this.peopleLayer.removeLayer(dot);
+    dot.remove();
+    delete this.peopleLookUp[personId];
+    const line = this.trailsLookUp[personId];
+    this.trailsLayer.removeLayer(line);
+    line.remove();
+    delete this.trailsLookUp[personId];
   }
 
   private updatePeople(people: Array<IPerson>): void {
     people.forEach(person => {
-      const personLayerId = this.peopleIdLookUp[person.id];
-      if (personLayerId === undefined) {
+      const dot = this.peopleLookUp[person.id];
+      if (dot === undefined) {
         this.addPerson(person);
       } else {
-        this.updatePerson(personLayerId, person);
+        this.updatePerson(person);
       }
     });
-    Object.keys(this.peopleIdLookUp).map(key => parseInt(key, null)).forEach(personId => {
+    Object.keys(this.peopleLookUp).map(key => parseInt(key, null)).forEach(personId => {
       if (people.findIndex((person) => person.id === personId) === -1) {
         this.removePerson(personId);
       }
     });
   }
 
-  private updatePerson(personLayerId: number, person: IPerson): void {
+  private updatePerson(person: IPerson): void {
     const location = latLng(person.location);
-    const dot = this.peopleLayer.getLayer(personLayerId) as Circle;
+    const dot = this.peopleLookUp[person.id];
     dot.setLatLng(location);
-    const line = this.trailsLayer.getLayer(this.trailsIdLookUp[person.id]) as Polyline;
-    line.addLatLng(location);
+    const line = this.trailsLookUp[person.id];
+    const latLngs = line.getLatLngs() as LatLng[];
+    if ((latLngs[latLngs.length - 2]).distanceTo(location) > environment.map.trailPointMinDistance) {
+      line.addLatLng(location);
+    } else {
+      const lineEnd = latLngs[latLngs.length - 1];
+      lineEnd.lat = location.lat;
+      lineEnd.lng = location.lng;
+    }
   }
 }

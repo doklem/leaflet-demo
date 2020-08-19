@@ -8,5 +8,6 @@ export interface IMapComponentOptions {
     malePersonLayer: CircleMarkerOptions;
     otherPersonLayer: CircleMarkerOptions;
     startLocation: ILocation;
+    trailPointMinDistance: number;
     trailsLayer: PolylineOptions;
 }

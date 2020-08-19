@@ -30,19 +30,20 @@ export const environment: IEnvironment = {
       lat: 46.999,
       lng: 7.457
     },
+    trailPointMinDistance: 5.0,
     trailsLayer: {
       weight: 1,
       color: 'red',
       opacity: 0.3
     }
   },
-  production: true,
+  production: false,
   worker:
   {
-    moveDelay: 50,
-    peopleBatchSize: 10,
+    moveDelay: 100,
+    peopleBatchSize: 25,
     peopleLifetimeAddition: 60000,
-    peopleMinCount: 250,
+    peopleMinCount: 1000,
     peopleMinLifetime: 60000,
     rotationMaxRadius: 0.005,
     rotationTime: 240000,
