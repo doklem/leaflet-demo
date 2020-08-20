@@ -78,7 +78,7 @@ export class PeopleWorkerLogic {
                 this.people.push(this.createPerson(radians, this.options.peopleMinLifetime));
             }
         }
-        postMessage(this.people.map(person => PeopleWorkerLogic.toIPerson(person)), null);
+        postMessage(new Map<number, IPerson>(this.people.map(person => [person.id, PeopleWorkerLogic.toIPerson(person)])), null);
         this.timeoutId = setTimeout(() => this.movePeople(), this.options.moveDelay);
     }
 }

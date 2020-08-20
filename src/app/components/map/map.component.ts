@@ -17,9 +17,9 @@ import { Gender } from '../../enums/gender.enum';
 })
 export class MapComponent implements OnDestroy, OnInit {
 
-  private readonly peopleLookUp: { [personId: number]: Circle };
+  private readonly peopleLookUp: Map<number, Circle>;
   private readonly peopleLayer: LayerGroup;
-  private readonly trailsLookUp: { [personId: number]: Polyline };
+  private readonly trailsLookUp: Map<number, Polyline>;
   private readonly trailsLayer: LayerGroup;
 
   private peopleSubscription: Subscription;
@@ -28,9 +28,9 @@ export class MapComponent implements OnDestroy, OnInit {
   public readonly options: MapOptions;
 
   constructor(private peopleService: PeopleService) {
-    this.peopleLookUp = {};
+    this.peopleLookUp = new Map<number, Circle>();
     this.peopleLayer = layerGroup();
-    this.trailsLookUp = {};
+    this.trailsLookUp = new Map<number, Polyline>();
     this.trailsLayer = layerGroup();
     this.layersControl = {
       baseLayers: {
@@ -96,46 +96,44 @@ export class MapComponent implements OnDestroy, OnInit {
     const dot = circle(location, options);
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
-    this.peopleLookUp[person.id] = dot;
+    this.peopleLookUp.set(person.id, dot);
     const line = polyline([location, location.clone()], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
-    this.trailsLookUp[person.id] = line;
+    this.trailsLookUp.set(person.id, line);
   }
 
-  private removePerson(personId: number): void {
-    const dot = this.peopleLookUp[personId];
+  private removePerson(personId: number, dot: Circle): void {
     dot.closePopup();
     dot.unbindPopup();
     this.peopleLayer.removeLayer(dot);
     dot.remove();
-    delete this.peopleLookUp[personId];
-    const line = this.trailsLookUp[personId];
+    this.peopleLookUp.delete(personId);
+    const line = this.trailsLookUp.get(personId);
     this.trailsLayer.removeLayer(line);
     line.remove();
-    delete this.trailsLookUp[personId];
+    this.trailsLookUp.delete(personId);
   }
 
-  private updatePeople(people: Array<IPerson>): void {
+  private updatePeople(people: Map<number, IPerson>): void {
     people.forEach(person => {
-      const dot = this.peopleLookUp[person.id];
+      const dot = this.peopleLookUp.get(person.id);
       if (dot === undefined) {
         this.addPerson(person);
       } else {
-        this.updatePerson(person);
+        this.updatePerson(person, dot);
       }
     });
-    Object.keys(this.peopleLookUp).map(key => parseInt(key, null)).forEach(personId => {
-      if (people.findIndex((person) => person.id === personId) === -1) {
-        this.removePerson(personId);
+    this.peopleLookUp.forEach((dot, personId) => {
+      if (!people.has(personId)) {
+        this.removePerson(personId, dot);
       }
     });
   }
 
-  private updatePerson(person: IPerson): void {
+  private updatePerson(person: IPerson, dot: Circle): void {
     const location = latLng(person.location);
-    const dot = this.peopleLookUp[person.id];
     dot.setLatLng(location);
-    const line = this.trailsLookUp[person.id];
+    const line = this.trailsLookUp.get(person.id);
     const latLngs = line.getLatLngs() as LatLng[];
     if ((latLngs[latLngs.length - 2]).distanceTo(location) > environment.map.trailPointMinDistance) {
       line.addLatLng(location);
