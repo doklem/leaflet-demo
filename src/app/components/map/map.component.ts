@@ -30,16 +30,13 @@ export class MapComponent implements OnDestroy, OnInit {
   constructor(private peopleService: PeopleService) {
     this.peopleLookUp = new Map<number, Circle>();
     this.peopleLayer = layerGroup();
-    this.trailsLookUp = new Map<number, Polyline>();
-    this.trailsLayer = layerGroup();
     this.layersControl = {
       baseLayers: {
         'Open Street Map': tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', environment.map.baseLayers),
         'Open Cycle Map': tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', environment.map.baseLayers)
       },
       overlays: {
-        People: this.peopleLayer,
-        Trails: this.trailsLayer
+        People: this.peopleLayer
       }
     };
     this.options = {
@@ -50,6 +47,12 @@ export class MapComponent implements OnDestroy, OnInit {
       zoom: environment.map.initialZoom,
       center: environment.map.startLocation
     };
+    if (!environment.map.trailsEnabled) {
+      return;
+    }
+    this.trailsLookUp = new Map<number, Polyline>();
+    this.trailsLayer = layerGroup();
+    this.layersControl.overlays.Trails = this.trailsLayer;
   }
 
   private static getPopupContent(person: IPerson): string {
@@ -97,6 +100,9 @@ export class MapComponent implements OnDestroy, OnInit {
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
     this.peopleLookUp.set(person.id, dot);
+    if (!environment.map.trailsEnabled) {
+      return;
+    }
     const line = polyline([location, location.clone()], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
     this.trailsLookUp.set(person.id, line);
@@ -108,6 +114,9 @@ export class MapComponent implements OnDestroy, OnInit {
     this.peopleLayer.removeLayer(dot);
     dot.remove();
     this.peopleLookUp.delete(personId);
+    if (!environment.map.trailsEnabled) {
+      return;
+    }
     const line = this.trailsLookUp.get(personId);
     this.trailsLayer.removeLayer(line);
     line.remove();
@@ -133,6 +142,9 @@ export class MapComponent implements OnDestroy, OnInit {
   private updatePerson(person: IPerson, dot: Circle): void {
     const location = latLng(person.location);
     dot.setLatLng(location);
+    if (!environment.map.trailsEnabled) {
+      return;
+    }
     const line = this.trailsLookUp.get(person.id);
     const latLngs = line.getLatLngs() as LatLng[];
     if ((latLngs[latLngs.length - 2]).distanceTo(location) > environment.map.trailPointMinDistance) {

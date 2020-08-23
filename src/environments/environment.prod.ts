@@ -31,6 +31,7 @@ export const environment: IEnvironment = {
       lng: 7.457
     },
     trailPointMinDistance: 5.0,
+    trailsEnabled: false,
     trailsLayer: {
       weight: 1,
       color: 'red',
