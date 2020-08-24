@@ -9,12 +9,12 @@ import { IPerson } from '../interfaces/iperson';
 export class PeopleService {
 
   private readonly worker: Worker;
-  private readonly subject: Subject<Map<number, IPerson>>;
+  private readonly subject: Subject<Array<IPerson>>;
 
-  public readonly people$: Observable<Map<number, IPerson>>;
+  public readonly people$: Observable<Array<IPerson>>;
 
   constructor() {
-    this.subject = new Subject<Map<number, IPerson>>();
+    this.subject = new Subject<Array<IPerson>>();
     this.people$ = this.subject.asObservable();
     this.worker = new Worker('../webworkers/people.worker', { type: 'module' });
     this.worker.onmessage = ({ data }) => this.subject.next(data);

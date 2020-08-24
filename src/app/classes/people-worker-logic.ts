@@ -1,6 +1,7 @@
 import { Person } from './person';
 import { IPerson } from '../interfaces/iperson';
 import { IPeopleWorkerOptions } from './../interfaces/ipeople-worker-options';
+import { PersonState } from '../enums/person-state.enum';
 
 export class PeopleWorkerLogic {
 
@@ -26,11 +27,18 @@ export class PeopleWorkerLogic {
     }
 
     private static toIPerson(person: Person): IPerson {
+        if (person.state === PersonState.REMOVED) {
+            return {
+                id: person.id,
+                state: person.state
+            };
+        }
         return {
             eta: person.eta,
             gender: person.gender,
             id: person.id,
-            location: person.location
+            location: person.location,
+            state: person.state
         };
     }
 
@@ -41,6 +49,7 @@ export class PeopleWorkerLogic {
         for (let i = 0; i < this.options.peopleMinCount; i++) {
             this.people.push(this.createPerson(radians, 0));
         }
+        postMessage(this.people.map(person => PeopleWorkerLogic.toIPerson(person)), null);
         this.movePeople();
     }
 
@@ -66,19 +75,29 @@ export class PeopleWorkerLogic {
 
     private movePeople(): void {
         clearTimeout(this.timeoutId);
-        // Remove people, which did leave
         const now = Date.now();
-        this.people = this.people.filter(person => person.eta > now);
-        // Update people, which did move
         const radians = this.getRadians();
-        this.people.forEach(person => PeopleWorkerLogic.setLocation(person, radians));
+        let activePeopleCount = 0;
+        this.people.forEach(person => {
+            // Mark people as deleted, which did leave
+            if (person.eta < now) {
+                person.state = PersonState.REMOVED;
+                return;
+            }
+            // Update people, which did move
+            PeopleWorkerLogic.setLocation(person, radians);
+            person.state = PersonState.MODIFIED;
+            activePeopleCount++;
+        });
         // Add new people, if there are too few
-        if (this.people.length < this.options.peopleMinCount) {
+        if (activePeopleCount < this.options.peopleMinCount) {
             for (let i = 0; i < this.options.peopleBatchSize; i++) {
                 this.people.push(this.createPerson(radians, this.options.peopleMinLifetime));
             }
         }
-        postMessage(new Map<number, IPerson>(this.people.map(person => [person.id, PeopleWorkerLogic.toIPerson(person)])), null);
+        postMessage(this.people.map(person => PeopleWorkerLogic.toIPerson(person)), null);
+        // Remove people, which are marked as deleted
+        this.people = this.people.filter(person => person.state !== PersonState.REMOVED);
         this.timeoutId = setTimeout(() => this.movePeople(), this.options.moveDelay);
     }
 }

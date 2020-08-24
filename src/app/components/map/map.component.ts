@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
 import { IPerson } from '../../interfaces/iperson';
 import { Gender } from '../../enums/gender.enum';
+import { PersonState } from '../../enums/person-state.enum';
 
 @Component({
   selector: 'app-map',
@@ -79,7 +80,21 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
-    this.peopleSubscription = this.peopleService.people$.subscribe(people => this.updatePeople(people));
+    this.peopleSubscription = this.peopleService.people$.subscribe(people =>
+      people.forEach(person => {
+        switch (person.state) {
+          case PersonState.ADDED:
+            this.addPerson(person);
+            break;
+          case PersonState.MODIFIED:
+            this.updatePerson(person);
+            break;
+          case PersonState.REMOVED:
+            this.removePerson(person.id);
+            break;
+        }
+      })
+    );
   }
 
   private addPerson(person: IPerson): void {
@@ -103,12 +118,17 @@ export class MapComponent implements OnDestroy, OnInit {
     if (!environment.map.trailsEnabled) {
       return;
     }
-    const line = polyline([location, location.clone()], environment.map.trailsLayer);
+    const line = polyline([location.clone(), location.clone()], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
     this.trailsLookUp.set(person.id, line);
   }
 
-  private removePerson(personId: number, dot: Circle): void {
+  private removePerson(personId: number): void {
+    const dot = this.peopleLookUp.get(personId);
+    // Check if the creation of the person was not missed because of late join.
+    if (dot === undefined) {
+      return;
+    }
     dot.closePopup();
     dot.unbindPopup();
     this.peopleLayer.removeLayer(dot);
@@ -123,23 +143,13 @@ export class MapComponent implements OnDestroy, OnInit {
     this.trailsLookUp.delete(personId);
   }
 
-  private updatePeople(people: Map<number, IPerson>): void {
-    people.forEach(person => {
-      const dot = this.peopleLookUp.get(person.id);
-      if (dot === undefined) {
-        this.addPerson(person);
-      } else {
-        this.updatePerson(person, dot);
-      }
-    });
-    this.peopleLookUp.forEach((dot, personId) => {
-      if (!people.has(personId)) {
-        this.removePerson(personId, dot);
-      }
-    });
-  }
-
-  private updatePerson(person: IPerson, dot: Circle): void {
+  private updatePerson(person: IPerson): void {
+    const dot = this.peopleLookUp.get(person.id);
+    // Check if the creation of the person was not missed because of late join.
+    if (dot === undefined) {
+      this.updatePerson(person);
+      return;
+    }
     const location = latLng(person.location);
     dot.setLatLng(location);
     if (!environment.map.trailsEnabled) {
@@ -148,7 +158,7 @@ export class MapComponent implements OnDestroy, OnInit {
     const line = this.trailsLookUp.get(person.id);
     const latLngs = line.getLatLngs() as LatLng[];
     if ((latLngs[latLngs.length - 2]).distanceTo(location) > environment.map.trailPointMinDistance) {
-      line.addLatLng(location);
+      line.addLatLng(location.clone());
     } else {
       const lineEnd = latLngs[latLngs.length - 1];
       lineEnd.lat = location.lat;

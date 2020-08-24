@@ -1,10 +1,12 @@
 import { Gender } from '../enums/gender.enum';
 import { ILocation } from '../interfaces/ilocation';
 import { IPerson } from '../interfaces/iperson';
+import { PersonState } from '../enums/person-state.enum';
 
 export class Person implements IPerson {
 
     public readonly location: ILocation;
+    public state: PersonState;
 
     constructor(
         public readonly id: number,
@@ -19,5 +21,6 @@ export class Person implements IPerson {
             lat: 0,
             lng: 0
         };
+        this.state = PersonState.ADDED;
     }
 }
