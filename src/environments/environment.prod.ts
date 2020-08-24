@@ -38,7 +38,7 @@ export const environment: IEnvironment = {
       opacity: 0.3
     }
   },
-  production: false,
+  production: true,
   worker:
   {
     moveDelay: 100,
