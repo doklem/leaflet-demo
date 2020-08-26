@@ -18,6 +18,11 @@ import { PersonState } from '../../enums/person-state.enum';
 })
 export class MapComponent implements OnDestroy, OnInit {
 
+  private static readonly MEASURE_ADD_PERSON = 'Add person';
+  private static readonly MEASURE_MODIFY_PERSON = 'Modify person';
+  private static readonly MEASURE_REMOVE_PERSON = 'Remove person';
+  private static readonly MEASURE_UPDATE_PEOPLE = 'Update people';
+
   private readonly peopleLookUp: Map<number, Circle>;
   private readonly peopleLayer: LayerGroup;
   private readonly trailsLookUp: Map<number, Polyline>;
@@ -80,21 +85,11 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
-    this.peopleSubscription = this.peopleService.people$.subscribe(people =>
-      people.forEach(person => {
-        switch (person.state) {
-          case PersonState.ADDED:
-            this.addPerson(person);
-            break;
-          case PersonState.MODIFIED:
-            this.updatePerson(person);
-            break;
-          case PersonState.REMOVED:
-            this.removePerson(person.id);
-            break;
-        }
-      })
-    );
+    if (environment.production) {
+      this.peopleSubscription = this.peopleService.people$.subscribe(people => this.updatePeople(people));
+    } else {
+      this.peopleSubscription = this.peopleService.people$.subscribe(people => this.updatePeopleWithMeasuring(people));
+    }
   }
 
   private addPerson(person: IPerson): void {
@@ -110,17 +105,44 @@ export class MapComponent implements OnDestroy, OnInit {
         options = environment.map.otherPersonLayer;
         break;
     }
-    const location = latLng(person.location);
-    const dot = circle(location, options);
+    const dot = circle(person.location, options);
     dot.bindPopup(MapComponent.getPopupContent(person));
     this.peopleLayer.addLayer(dot);
     this.peopleLookUp.set(person.id, dot);
-    if (!environment.map.trailsEnabled) {
-      return;
-    }
-    const line = polyline([location.clone(), location.clone()], environment.map.trailsLayer);
+  }
+
+  private addTrail(person: IPerson): void {
+    const locationLatLng = latLng(person.location);
+    const line = polyline([locationLatLng.clone(), locationLatLng.clone()], environment.map.trailsLayer);
     this.trailsLayer.addLayer(line);
     this.trailsLookUp.set(person.id, line);
+  }
+
+  private modifyPerson(person: IPerson): void {
+    const dot = this.peopleLookUp.get(person.id);
+    // Check if the creation of the person was not missed because of late join.
+    if (dot === undefined) {
+      this.addPerson(person);
+      return;
+    }
+    dot.setLatLng(person.location);
+  }
+
+  private modifyTrail(person: IPerson): void {
+    const line = this.trailsLookUp.get(person.id);
+    // Check if the creation of the person was not missed because of late join.
+    if (line === undefined) {
+      this.addTrail(person);
+      return;
+    }
+    const latLngs = line.getLatLngs() as LatLng[];
+    if ((latLngs[latLngs.length - 2]).distanceTo(person.location) > environment.map.trailPointMinDistance) {
+      line.addLatLng(latLng(person.location).clone());
+    } else {
+      const lineEnd = latLngs[latLngs.length - 1];
+      lineEnd.lat = person.location.lat;
+      lineEnd.lng = person.location.lng;
+    }
   }
 
   private removePerson(personId: number): void {
@@ -134,35 +156,100 @@ export class MapComponent implements OnDestroy, OnInit {
     this.peopleLayer.removeLayer(dot);
     dot.remove();
     this.peopleLookUp.delete(personId);
-    if (!environment.map.trailsEnabled) {
+  }
+
+  private removeTrail(personId: number): void {
+    const line = this.trailsLookUp.get(personId);
+    // Check if the creation of the person was not missed because of late join.
+    if (line === undefined) {
       return;
     }
-    const line = this.trailsLookUp.get(personId);
     this.trailsLayer.removeLayer(line);
     line.remove();
     this.trailsLookUp.delete(personId);
   }
 
-  private updatePerson(person: IPerson): void {
-    const dot = this.peopleLookUp.get(person.id);
-    // Check if the creation of the person was not missed because of late join.
-    if (dot === undefined) {
-      this.updatePerson(person);
-      return;
-    }
-    const location = latLng(person.location);
-    dot.setLatLng(location);
-    if (!environment.map.trailsEnabled) {
-      return;
-    }
-    const line = this.trailsLookUp.get(person.id);
-    const latLngs = line.getLatLngs() as LatLng[];
-    if ((latLngs[latLngs.length - 2]).distanceTo(location) > environment.map.trailPointMinDistance) {
-      line.addLatLng(location.clone());
+  private updatePeople(people: Array<IPerson>): void {
+    if (environment.map.trailsEnabled) {
+      people.forEach(person => {
+        switch (person.state) {
+          case PersonState.ADDED:
+            this.addPerson(person);
+            this.addTrail(person);
+            break;
+          case PersonState.MODIFIED:
+            this.modifyPerson(person);
+            this.modifyTrail(person);
+            break;
+          case PersonState.REMOVED:
+            this.removePerson(person.id);
+            this.removeTrail(person.id);
+            break;
+        }
+      });
     } else {
-      const lineEnd = latLngs[latLngs.length - 1];
-      lineEnd.lat = location.lat;
-      lineEnd.lng = location.lng;
+      people.forEach(person => {
+        switch (person.state) {
+          case PersonState.ADDED:
+            this.addPerson(person);
+            break;
+          case PersonState.MODIFIED:
+            this.modifyPerson(person);
+            break;
+          case PersonState.REMOVED:
+            this.removePerson(person.id);
+            break;
+        }
+      });
     }
+  }
+
+  private updatePeopleWithMeasuring(people: Array<IPerson>): void {
+    window.performance.measure(MapComponent.MEASURE_UPDATE_PEOPLE);
+    if (environment.map.trailsEnabled) {
+      people.forEach(person => {
+        switch (person.state) {
+          case PersonState.ADDED:
+            window.performance.measure(MapComponent.MEASURE_ADD_PERSON);
+            this.addPerson(person);
+            this.addTrail(person);
+            window.performance.clearMeasures(MapComponent.MEASURE_ADD_PERSON);
+            break;
+          case PersonState.MODIFIED:
+            window.performance.measure(MapComponent.MEASURE_MODIFY_PERSON);
+            this.modifyPerson(person);
+            this.modifyTrail(person);
+            window.performance.clearMeasures(MapComponent.MEASURE_MODIFY_PERSON);
+            break;
+          case PersonState.REMOVED:
+            window.performance.measure(MapComponent.MEASURE_REMOVE_PERSON);
+            this.removePerson(person.id);
+            this.removeTrail(person.id);
+            window.performance.clearMeasures(MapComponent.MEASURE_REMOVE_PERSON);
+            break;
+        }
+      });
+    } else {
+      people.forEach(person => {
+        switch (person.state) {
+          case PersonState.ADDED:
+            window.performance.measure(MapComponent.MEASURE_ADD_PERSON);
+            this.addPerson(person);
+            window.performance.clearMeasures(MapComponent.MEASURE_ADD_PERSON);
+            break;
+          case PersonState.MODIFIED:
+            window.performance.measure(MapComponent.MEASURE_MODIFY_PERSON);
+            this.modifyPerson(person);
+            window.performance.clearMeasures(MapComponent.MEASURE_MODIFY_PERSON);
+            break;
+          case PersonState.REMOVED:
+            window.performance.measure(MapComponent.MEASURE_REMOVE_PERSON);
+            this.removePerson(person.id);
+            window.performance.clearMeasures(MapComponent.MEASURE_REMOVE_PERSON);
+            break;
+        }
+      });
+    }
+    window.performance.clearMeasures(MapComponent.MEASURE_UPDATE_PEOPLE);
   }
 }
