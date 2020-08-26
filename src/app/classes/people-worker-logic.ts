@@ -1,7 +1,7 @@
 import { Person } from './person';
-import { IPerson } from '../interfaces/iperson';
 import { IPeopleWorkerOptions } from './../interfaces/ipeople-worker-options';
 import { PersonState } from '../enums/person-state.enum';
+import { PeopleSerializer } from './people-serializer';
 
 export class PeopleWorkerLogic {
 
@@ -10,6 +10,7 @@ export class PeopleWorkerLogic {
     private people: Array<Person>;
     private rotationHalfTime: number;
     private timeoutId: number;
+    private sendPeople: (people: ArrayBuffer) => void;
 
     constructor() {
         this.idCounter = 0;
@@ -26,30 +27,16 @@ export class PeopleWorkerLogic {
         }
     }
 
-    private static toIPerson(person: Person): IPerson {
-        if (person.state === PersonState.REMOVED) {
-            return {
-                id: person.id,
-                state: person.state
-            };
-        }
-        return {
-            eta: person.eta,
-            gender: person.gender,
-            id: person.id,
-            location: person.location,
-            state: person.state
-        };
-    }
-
-    public initialize(options: IPeopleWorkerOptions): void {
+    public initialize(options: IPeopleWorkerOptions, sendPeople: (people: ArrayBuffer) => void): void {
         this.options = options;
+        this.sendPeople = sendPeople;
         this.rotationHalfTime = this.options.rotationTime * 0.5;
         const radians = this.getRadians();
         for (let i = 0; i < this.options.peopleMinCount; i++) {
             this.people.push(this.createPerson(radians, 0));
         }
-        postMessage(this.people.map(person => PeopleWorkerLogic.toIPerson(person)), null);
+        const buffer = PeopleSerializer.serialize(this.people);
+        this.sendPeople(buffer);
         this.movePeople();
     }
 
@@ -95,7 +82,8 @@ export class PeopleWorkerLogic {
                 this.people.push(this.createPerson(radians, this.options.peopleMinLifetime));
             }
         }
-        postMessage(this.people.map(person => PeopleWorkerLogic.toIPerson(person)), null);
+        const buffer = PeopleSerializer.serialize(this.people);
+        this.sendPeople(buffer);
         // Remove people, which are marked as deleted
         this.people = this.people.filter(person => person.state !== PersonState.REMOVED);
         this.timeoutId = setTimeout(() => this.movePeople(), this.options.moveDelay);
