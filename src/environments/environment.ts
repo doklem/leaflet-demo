@@ -14,20 +14,20 @@ export const environment: IEnvironment = {
       radius: 5,
       weight: 0,
       fillColor: 'red',
-      fillOpacity: 0.6
+      fillOpacity: 1
     },
     initialZoom: 17,
     malePersonLayer: {
       radius: 5,
       weight: 0,
       fillColor: 'blue',
-      fillOpacity: 0.6
+      fillOpacity: 1
     },
     otherPersonLayer: {
       radius: 5,
       weight: 0,
       fillColor: 'green',
-      fillOpacity: 0.6
+      fillOpacity: 1
     },
     startLocation:
     {
@@ -48,7 +48,7 @@ export const environment: IEnvironment = {
     moveDelay: 100,
     peopleBatchSize: 25,
     peopleLifetimeAddition: 60000,
-    peopleMinCount: 1000,
+    peopleMinCount: 2000,
     peopleMinLifetime: 60000,
     rotationMaxRadius: 0.005,
     rotationTime: 240000,

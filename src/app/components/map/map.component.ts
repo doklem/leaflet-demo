@@ -28,12 +28,16 @@ export class MapComponent implements OnDestroy, OnInit {
   private readonly trailsLookUp: Map<number, Polyline>;
   private readonly trailsLayer: LayerGroup;
 
+  private isActice: boolean;
+  private peopleBuffer: Array<IPerson>;
   private peopleSubscription: Subscription;
 
   public readonly layersControl: LeafletControlLayersConfig;
   public readonly options: MapOptions;
 
   constructor(private peopleService: PeopleService) {
+    this.isActice = false;
+    this.peopleBuffer = null;
     this.peopleLookUp = new Map<number, Circle>();
     this.peopleLayer = layerGroup();
     this.layersControl = {
@@ -80,15 +84,19 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnDestroy(): void {
+    this.isActice = false;
     this.peopleSubscription.unsubscribe();
     this.peopleSubscription = null;
+    this.peopleBuffer = null;
   }
 
   public ngOnInit(): void {
+    this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
+    this.isActice = true;
     if (environment.production) {
-      this.peopleSubscription = this.peopleService.people$.subscribe(people => this.updatePeople(people));
+      requestAnimationFrame(() => this.updatePeople());
     } else {
-      this.peopleSubscription = this.peopleService.people$.subscribe(people => this.updatePeopleWithMeasuring(people));
+      requestAnimationFrame(() => this.updatePeopleWithMeasuring());
     }
   }
 
@@ -169,7 +177,16 @@ export class MapComponent implements OnDestroy, OnInit {
     this.trailsLookUp.delete(personId);
   }
 
-  private updatePeople(people: Array<IPerson>): void {
+  private updatePeople(): void {
+    if (!this.isActice) {
+      return;
+    }
+    if (this.peopleBuffer === null) {
+      requestAnimationFrame(() => this.updatePeople());
+      return;
+    }
+    const people = this.peopleBuffer;
+    this.peopleBuffer = null;
     if (environment.map.trailsEnabled) {
       people.forEach(person => {
         switch (person.state) {
@@ -202,9 +219,19 @@ export class MapComponent implements OnDestroy, OnInit {
         }
       });
     }
+    requestAnimationFrame(() => this.updatePeople());
   }
 
-  private updatePeopleWithMeasuring(people: Array<IPerson>): void {
+  private updatePeopleWithMeasuring(): void {
+    if (!this.isActice) {
+      return;
+    }
+    if (this.peopleBuffer === null) {
+      requestAnimationFrame(() => this.updatePeopleWithMeasuring());
+      return;
+    }
+    const people = this.peopleBuffer;
+    this.peopleBuffer = null;
     window.performance.measure(MapComponent.MEASURE_UPDATE_PEOPLE);
     if (environment.map.trailsEnabled) {
       people.forEach(person => {
@@ -251,5 +278,6 @@ export class MapComponent implements OnDestroy, OnInit {
       });
     }
     window.performance.clearMeasures(MapComponent.MEASURE_UPDATE_PEOPLE);
+    requestAnimationFrame(() => this.updatePeopleWithMeasuring());
   }
 }
