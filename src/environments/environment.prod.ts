@@ -3,35 +3,35 @@ import { IEnvironment } from './../app/interfaces/ienvironment';
 export const environment: IEnvironment = {
   map: {
     baseLayers: {
-      maxZoom: 19,
+      maxZoom: 20,
       attribution: '...'
     },
     femalePersonLayer: {
-      radius: 5,
+      radius: 0.5,
       weight: 0,
       fillColor: 'red',
       fillOpacity: 1
     },
-    initialZoom: 17,
+    initialZoom: 18,
     malePersonLayer: {
-      radius: 5,
+      radius: 0.5,
       weight: 0,
       fillColor: 'blue',
       fillOpacity: 1
     },
     otherPersonLayer: {
-      radius: 5,
+      radius: 0.5,
       weight: 0,
       fillColor: 'green',
       fillOpacity: 1
     },
     startLocation:
     {
-      lat: 46.999,
-      lng: 7.457
+      lat: 46.949,
+      lng: 7.439
     },
-    trailPointMinDistance: 5.0,
-    trailsEnabled: false,
+    trailPointMinDistance: 0.5,
+    trailsEnabled: true,
     trailsLayer: {
       weight: 1,
       color: 'red',
@@ -46,13 +46,13 @@ export const environment: IEnvironment = {
     peopleLifetimeAddition: 60000,
     peopleMinCount: 2000,
     peopleMinLifetime: 60000,
-    rotationMaxRadius: 0.005,
+    rotationMaxRadius: 0.0005,
     rotationTime: 240000,
-    spreadRadius: 0.01,
+    spreadRadius: 0.001,
     startLocation:
     {
-      lat: 46.994,
-      lng: 7.452
+      lat: 46.9485,
+      lng: 7.4385
     }
   }
 };
