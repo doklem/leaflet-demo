@@ -32,12 +32,13 @@ export class TrailLayerManager extends LayerManagerGenericBase<Polyline> {
     }
 
     public modifyPerson(person: IPerson): void {
-        this.root.modifyPerson(person);
         const line = this.lookUp.get(person.id);
         // Check if the creation of the person was not missed because of late join.
         if (line === undefined) {
             this.addPerson(person);
             return;
+        } else {
+            this.root.modifyPerson(person);
         }
         const latLngs = line.getLatLngs() as LatLng[];
         if ((latLngs[latLngs.length - 2]).distanceTo(person.location) > environment.map.trails.pointMinDistance) {
