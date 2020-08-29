@@ -1,7 +1,7 @@
 import { Person } from './person';
 import { IPeopleWorkerOptions } from './../interfaces/ipeople-worker-options';
 import { PersonState } from '../enums/person-state.enum';
-import { PeopleSerializer } from './people-serializer';
+import { IPerson } from '../interfaces/iperson';
 
 export class PeopleWorkerLogic {
 
@@ -9,10 +9,11 @@ export class PeopleWorkerLogic {
     private options: IPeopleWorkerOptions;
     private people: Array<Person>;
     private rotationHalfTime: number;
+    private readonly sendPeople: (people: Array<IPerson>) => void;
     private timeoutId: number;
-    private sendPeople: (people: ArrayBuffer) => void;
 
-    constructor() {
+    constructor(sendPeople: (people: Array<IPerson>) => void) {
+        this.sendPeople = sendPeople;
         this.idCounter = 0;
         this.people = new Array<Person>();
         this.timeoutId = 0;
@@ -27,16 +28,13 @@ export class PeopleWorkerLogic {
         }
     }
 
-    public initialize(options: IPeopleWorkerOptions, sendPeople: (people: ArrayBuffer) => void): void {
+    public initialize(options: IPeopleWorkerOptions): void {
         this.options = options;
-        this.sendPeople = sendPeople;
         this.rotationHalfTime = this.options.rotationTime * 0.5;
         const radians = this.getRadians();
         for (let i = 0; i < this.options.peopleMinCount; i++) {
             this.people.push(this.createPerson(radians, 0));
         }
-        const buffer = PeopleSerializer.serialize(this.people);
-        this.sendPeople(buffer);
         this.movePeople();
     }
 
@@ -51,7 +49,7 @@ export class PeopleWorkerLogic {
                 lng: this.options.startLocation.lng + (Math.random() * this.options.spreadRadius)
             },
             this.idCounter % 2 === 0,
-            this.options.rotationMaxRadius * Math.random());
+            this.options.rotationMinRadius + this.options.rotationRadiusAddition * Math.random());
         PeopleWorkerLogic.setLocation(person, radians);
         return person;
     }
@@ -66,6 +64,10 @@ export class PeopleWorkerLogic {
         const radians = this.getRadians();
         let activePeopleCount = 0;
         this.people.forEach(person => {
+            // Ignore people, which are in their afterlife
+            if (person.state === PersonState.REMOVED) {
+                return;
+            }
             // Mark people as deleted, which did leave
             if (person.eta < now) {
                 person.state = PersonState.REMOVED;
@@ -82,10 +84,10 @@ export class PeopleWorkerLogic {
                 this.people.push(this.createPerson(radians, this.options.peopleMinLifetime));
             }
         }
-        const buffer = PeopleSerializer.serialize(this.people);
-        this.sendPeople(buffer);
-        // Remove people, which are marked as deleted
-        this.people = this.people.filter(person => person.state !== PersonState.REMOVED);
+        this.sendPeople(this.people);
+        // Remove people, which have reached the end of their afterlife.
+        const end = now - this.options.peopleAfterlifeDuration;
+        this.people = this.people.filter(person => person.eta > end);
         this.timeoutId = setTimeout(() => this.movePeople(), this.options.moveDelay);
     }
 }

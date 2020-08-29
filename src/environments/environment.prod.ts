@@ -56,15 +56,17 @@ export const environment: IEnvironment = {
   {
     moveDelay: 100,
     peopleBatchSize: 25,
+    peopleAfterlifeDuration: 5000,
     peopleLifetimeAddition: 60000,
     peopleMinCount: 2000,
     peopleMinLifetime: 60000,
-    rotationMaxRadius: 0.00025,
+    rotationMinRadius: 0.000003,
+    rotationRadiusAddition: 0.000247,
     rotationTime: 240000,
     spreadRadius: 0.002,
     startLocation:
     {
-      lat: 46.9485,
+      lat: 46.9481,
       lng: 7.4385
     }
   }
