@@ -58,7 +58,7 @@ export class MapComponent implements OnDestroy, OnInit {
     if (!environment.production) {
       this.layerManager = new PerformanceMeasuringLayerManager(this.layerManager);
     }
-    map(this.mapElement.nativeElement, options).addControl(layerControl);
+    map(this.mapElement.nativeElement, options).addControl(layerControl).addControl(control.scale());
     this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
     requestAnimationFrame(() => this.updatePeople());
   }
