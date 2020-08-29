@@ -1,14 +1,12 @@
-import { CircleMarkerOptions, TileLayerOptions, PolylineOptions } from 'leaflet';
+import { CircleMarkerOptions, TileLayerOptions } from 'leaflet';
 import { ILocation } from './ilocation';
+import { ITrailLayerManagerOptions } from './itrail-layer-manager-options';
+import { ILayerManagerOptions } from './ilayer-manager-options';
 
 export interface IMapComponentOptions {
     baseLayers: TileLayerOptions;
-    femalePersonLayer: CircleMarkerOptions;
     initialZoom: number;
-    malePersonLayer: CircleMarkerOptions;
-    otherPersonLayer: CircleMarkerOptions;
+    people: ILayerManagerOptions<CircleMarkerOptions>;
     startLocation: ILocation;
-    trailPointMinDistance: number;
-    trailsEnabled: boolean;
-    trailsLayer: PolylineOptions;
+    trails: ITrailLayerManagerOptions;
 }

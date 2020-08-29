@@ -6,36 +6,49 @@ export const environment: IEnvironment = {
       maxZoom: 24,
       attribution: '...'
     },
-    femalePersonLayer: {
-      radius: 0.25,
-      weight: 0,
-      fillColor: 'red',
-      fillOpacity: 1
-    },
     initialZoom: 20,
-    malePersonLayer: {
-      radius: 0.25,
-      weight: 0,
-      fillColor: 'blue',
-      fillOpacity: 1
+    people: {
+      femaleLayer: {
+        radius: 0.25,
+        weight: 0,
+        fillColor: 'red',
+        fillOpacity: 1
+      },
+      maleLayer: {
+        radius: 0.25,
+        weight: 0,
+        fillColor: 'blue',
+        fillOpacity: 1
+      },
+      otherLayer: {
+        radius: 0.25,
+        weight: 0,
+        fillColor: 'green',
+        fillOpacity: 1
+      }
     },
-    otherPersonLayer: {
-      radius: 0.25,
-      weight: 0,
-      fillColor: 'green',
-      fillOpacity: 1
-    },
-    startLocation:
-    {
+    startLocation: {
       lat: 46.949,
       lng: 7.4393
     },
-    trailPointMinDistance: 0.25,
-    trailsEnabled: true,
-    trailsLayer: {
-      weight: 1,
-      color: 'red',
-      opacity: 0.3
+    trails: {
+      enabled: true,
+      femaleLayer: {
+        weight: 1,
+        color: 'red',
+        opacity: 0.3
+      },
+      maleLayer: {
+        weight: 1,
+        color: 'blue',
+        opacity: 0.3
+      },
+      otherLayer: {
+        weight: 1,
+        color: 'green',
+        opacity: 0.3
+      },
+      pointMinDistance: 0.25
     }
   },
   production: true,

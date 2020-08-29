@@ -51,14 +51,14 @@ export class MapComponent implements OnDestroy, OnInit {
       zoom: environment.map.initialZoom,
       center: environment.map.startLocation
     };
-    if (environment.map.trailsEnabled) {
+    if (environment.map.trails.enabled) {
       this.layerManager = new TrailLayerManager(this.layerManager);
       layerControl.addOverlay(this.layerManager.layers, 'Trails');
     }
     if (!environment.production) {
       this.layerManager = new PerformanceMeasuringLayerManager(this.layerManager);
     }
-    map(this.mapElement.nativeElement, options).addControl(layerControl).addControl(control.scale());
+    const t = map(this.mapElement.nativeElement, options).addControl(layerControl).addControl(control.scale());
     this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
     requestAnimationFrame(() => this.updatePeople());
   }

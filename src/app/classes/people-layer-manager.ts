@@ -28,13 +28,13 @@ export class PeopleLayerManager extends LayerManagerGenericBase<Circle> {
         let options: CircleMarkerOptions;
         switch (person.gender) {
             case Gender.FEMALE:
-                options = environment.map.femalePersonLayer;
+                options = environment.map.people.femaleLayer;
                 break;
             case Gender.MALE:
-                options = environment.map.malePersonLayer;
+                options = environment.map.people.maleLayer;
                 break;
             default:
-                options = environment.map.otherPersonLayer;
+                options = environment.map.people.otherLayer;
                 break;
         }
         const dot = circle(person.location, options);

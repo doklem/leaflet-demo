@@ -1,8 +1,9 @@
+import { LatLng, latLng, Polyline, polyline, PolylineOptions } from 'leaflet';
 import { LayerManagerGenericBase } from './layer-manager-generic-base';
 import { LayerManagerBase } from './layer-manager-base';
-import { Polyline, LatLng, latLng, polyline } from 'leaflet';
 import { IPerson } from '../interfaces/iperson';
 import { environment } from '../../environments/environment';
+import { Gender } from '../enums/gender.enum';
 
 export class TrailLayerManager extends LayerManagerGenericBase<Polyline> {
 
@@ -13,7 +14,19 @@ export class TrailLayerManager extends LayerManagerGenericBase<Polyline> {
     public addPerson(person: IPerson): void {
         this.root.addPerson(person);
         const locationLatLng = latLng(person.location);
-        const line = polyline([locationLatLng.clone(), locationLatLng.clone()], environment.map.trailsLayer);
+        let options: PolylineOptions;
+        switch (person.gender) {
+            case Gender.FEMALE:
+                options = environment.map.trails.femaleLayer;
+                break;
+            case Gender.MALE:
+                options = environment.map.trails.maleLayer;
+                break;
+            case Gender.OTHER:
+                options = environment.map.trails.otherLayer;
+                break;
+        }
+        const line = polyline([locationLatLng.clone(), locationLatLng.clone()], options);
         this.layers.addLayer(line);
         this.lookUp.set(person.id, line);
     }
@@ -27,7 +40,7 @@ export class TrailLayerManager extends LayerManagerGenericBase<Polyline> {
             return;
         }
         const latLngs = line.getLatLngs() as LatLng[];
-        if ((latLngs[latLngs.length - 2]).distanceTo(person.location) > environment.map.trailPointMinDistance) {
+        if ((latLngs[latLngs.length - 2]).distanceTo(person.location) > environment.map.trails.pointMinDistance) {
             line.addLatLng(latLng(person.location).clone());
         } else {
             const lineEnd = latLngs[latLngs.length - 1];
