@@ -7,7 +7,7 @@ import { IEnvironment } from './../app/interfaces/ienvironment';
 export const environment: IEnvironment = {
   map: {
     baseLayers: {
-      maxZoom: 20,
+      maxZoom: 24,
       attribution: '...'
     },
     femalePersonLayer: {
@@ -16,7 +16,7 @@ export const environment: IEnvironment = {
       fillColor: 'red',
       fillOpacity: 1
     },
-    initialZoom: 18,
+    initialZoom: 19,
     malePersonLayer: {
       radius: 0.5,
       weight: 0,
