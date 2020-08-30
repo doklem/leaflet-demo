@@ -3,11 +3,13 @@ import { Control, control, map, MapOptions, tileLayer } from 'leaflet';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
+import { IPerson } from '../../interfaces/iperson';
 import { PeopleLayerManager } from '../../classes/people-layer-manager';
 import { TrailLayerManager } from '../../classes/trail-layer-manager';
-import { IPerson } from '../../interfaces/iperson';
-import { PerformanceMeasuringLayerManager } from '../../classes/performance-measuring-layer-manager';
+import { LayerUpdater } from '../../classes/layer-updater';
+import { PerformanceMeasuringLayerUpdater } from '../../classes/performance-measuring-layer-updater';
 import { LayerManagerBase } from '../../classes/layer-manager-base';
+import { ILayerManagerOptions } from 'src/app/interfaces/ilayer-manager-options';
 
 @Component({
   selector: 'app-map',
@@ -16,7 +18,7 @@ import { LayerManagerBase } from '../../classes/layer-manager-base';
 })
 export class MapComponent implements OnDestroy, OnInit {
 
-  private layerManager: LayerManagerBase;
+  private layerUpdater: LayerUpdater;
   private peopleBuffer: Array<IPerson>;
   private peopleSubscription: Subscription;
 
@@ -34,33 +36,40 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
-    this.layerManager = new PeopleLayerManager();
     const baseLayers: Control.LayersObject = {
       'Open Cycle Map': tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', environment.map.baseLayers),
       'Open Street Map': tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', environment.map.baseLayers)
     };
-    const overlays: Control.LayersObject = {
-      People: this.layerManager.layers
-    };
-    const layerControl = control.layers(baseLayers, overlays);
-    const options: MapOptions = {
+    const mapOptions: MapOptions = {
       layers: [
-        baseLayers['Open Cycle Map'],
-        overlays.People
+        baseLayers['Open Cycle Map']
       ],
       zoom: environment.map.initialZoom,
       center: environment.map.startLocation
     };
-    if (environment.map.trails.enabled) {
-      this.layerManager = new TrailLayerManager(this.layerManager);
-      layerControl.addOverlay(this.layerManager.layers, 'Trails');
-    }
-    if (!environment.production) {
-      this.layerManager = new PerformanceMeasuringLayerManager(this.layerManager);
-    }
-    map(this.mapElement.nativeElement, options).addControl(layerControl).addControl(control.scale());
+    this.layerUpdater = environment.production ? new PerformanceMeasuringLayerUpdater() : new LayerUpdater();
+    const layerControl = control.layers(baseLayers, {});
+    this.addLayer(mapOptions, layerControl, environment.map.people, () => new PeopleLayerManager());
+    this.addLayer(mapOptions, layerControl, environment.map.trails, () => new TrailLayerManager());
+    map(this.mapElement.nativeElement, mapOptions)
+      .addControl(layerControl)
+      .addControl(control.scale());
     this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
     requestAnimationFrame(() => this.updatePeople());
+  }
+
+  private addLayer<TLayerManager extends LayerManagerBase>(
+    mapOptions: MapOptions,
+    layerControl: Control.Layers,
+    options: ILayerManagerOptions<any>,
+    creator: () => TLayerManager): void {
+    if (options.enabled) {
+      const manager = this.layerUpdater.addManager(creator());
+      if (options.initialVisible) {
+        mapOptions.layers.push(manager.layers);
+      }
+      layerControl.addOverlay(manager.layers, options.title);
+    }
   }
 
   private updatePeople(): void {
@@ -70,7 +79,7 @@ export class MapComponent implements OnDestroy, OnInit {
     if (this.peopleBuffer !== null) {
       const people = this.peopleBuffer;
       this.peopleBuffer = null;
-      this.layerManager.updatePeople(people);
+      this.layerUpdater.updatePeople(people);
     }
     requestAnimationFrame(() => this.updatePeople());
   }

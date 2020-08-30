@@ -5,8 +5,8 @@ export abstract class LayerManagerGenericBase<TLayer extends Layer> extends Laye
 
   protected readonly lookUp: Map<number, TLayer>;
 
-  constructor(root?: LayerManagerBase, useRootLayerGroup?: boolean) {
-    super(root, useRootLayerGroup);
+  constructor() {
+    super();
     this.lookUp = new Map<number, TLayer>();
   }
 }

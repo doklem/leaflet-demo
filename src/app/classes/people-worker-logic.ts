@@ -20,11 +20,11 @@ export class PeopleWorkerLogic {
     }
 
     private static setLocation(person: Person, radians: number): void {
-        person.location.lat = person.rotationCenter.lat + (Math.sin(radians + person.radianOffset) * person.rotationRadius);
+        person.location.lat = person.rotationCenter.lat + Math.sin(radians + person.radianOffset) * person.rotationRadius;
         if (person.rotationDirection) {
-            person.location.lng = person.rotationCenter.lng - (Math.cos(radians + person.radianOffset) * person.rotationRadius);
+            person.location.lng = person.rotationCenter.lng - Math.cos(radians + person.radianOffset) * person.rotationRadius;
         } else {
-            person.location.lng = person.rotationCenter.lng + (Math.cos(radians + person.radianOffset) * person.rotationRadius);
+            person.location.lng = person.rotationCenter.lng + Math.cos(radians + person.radianOffset) * person.rotationRadius;
         }
     }
 
@@ -45,8 +45,8 @@ export class PeopleWorkerLogic {
             this.idCounter % 3,
             Math.random() * (Math.PI + Math.PI),
             {
-                lat: this.options.startLocation.lat + (Math.random() * this.options.spreadRadius),
-                lng: this.options.startLocation.lng + (Math.random() * this.options.spreadRadius)
+                lat: this.options.startLocation.lat + Math.random() * this.options.spreadRadius,
+                lng: this.options.startLocation.lng + Math.random() * this.options.spreadRadius
             },
             this.idCounter % 2 === 0,
             this.options.rotationMinRadius + this.options.rotationRadiusAddition * Math.random());

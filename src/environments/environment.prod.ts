@@ -8,12 +8,14 @@ export const environment: IEnvironment = {
     },
     initialZoom: 20,
     people: {
+      enabled: true,
       femaleLayer: {
         radius: 0.25,
         weight: 0,
         fillColor: 'red',
         fillOpacity: 1
       },
+      initialVisible: true,
       maleLayer: {
         radius: 0.25,
         weight: 0,
@@ -25,7 +27,8 @@ export const environment: IEnvironment = {
         weight: 0,
         fillColor: 'green',
         fillOpacity: 1
-      }
+      },
+      title: 'People'
     },
     startLocation: {
       lat: 46.949,
@@ -38,6 +41,7 @@ export const environment: IEnvironment = {
         color: 'red',
         opacity: 0.3
       },
+      initialVisible: false,
       maleLayer: {
         weight: 1,
         color: 'blue',
@@ -48,7 +52,8 @@ export const environment: IEnvironment = {
         color: 'green',
         opacity: 0.3
       },
-      pointMinDistance: 0.25
+      pointMinDistance: 0.25,
+      title: 'Trails'
     }
   },
   production: true,
