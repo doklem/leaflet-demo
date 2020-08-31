@@ -8,6 +8,12 @@ describe('Person', () => {
     expect(person).toBeTruthy();
   });
 
+  it('should create an instance with an empty location', () => {
+    expect(person.location).toBeDefined();
+    expect(person.location.lat).toBe(0);
+    expect(person.location.lng).toBe(0);
+  });
+
   it('should create an instance as added', () => {
     expect(person.state).toBe(PersonState.ADDED);
   });
