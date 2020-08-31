@@ -4,7 +4,7 @@ import { LayerManagerBase } from './layer-manager-base';
 
 export class LayerUpdater {
 
-    private readonly managers: Array<LayerManagerBase>;
+    protected readonly managers: Array<LayerManagerBase>;
 
     constructor() {
         this.managers = [];
