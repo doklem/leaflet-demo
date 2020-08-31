@@ -47,7 +47,7 @@ export class MapComponent implements OnDestroy, OnInit {
       zoom: environment.map.initialZoom,
       center: environment.map.startLocation
     };
-    this.layerUpdater = environment.production ? new PerformanceMeasuringLayerUpdater() : new LayerUpdater();
+    this.layerUpdater = environment.production ? new LayerUpdater() : new PerformanceMeasuringLayerUpdater();
     const layerControl = control.layers(baseLayers, {});
     this.addLayer(mapOptions, layerControl, environment.map.people, () => new PeopleLayerManager());
     this.addLayer(mapOptions, layerControl, environment.map.trails, () => new TrailLayerManager());
