@@ -59,6 +59,7 @@ export class PeopleWorkerLogic {
     }
 
     private movePeople(): void {
+        const start = Date.now();
         clearTimeout(this.timeoutId);
         const now = Date.now();
         const radians = this.getRadians();
@@ -88,6 +89,6 @@ export class PeopleWorkerLogic {
         // Remove people, which have reached the end of their afterlife.
         const end = now - this.options.peopleAfterlifeDuration;
         this.people = this.people.filter(person => person.eta > end);
-        this.timeoutId = setTimeout(() => this.movePeople(), this.options.moveDelay);
+        this.timeoutId = setTimeout(() => this.movePeople(), Math.max(this.options.moveDelay - (Date.now() - start), 0));
     }
 }
