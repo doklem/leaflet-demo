@@ -2,11 +2,25 @@ import { IEnvironment } from './../app/interfaces/ienvironment';
 
 export const environment: IEnvironment = {
   map: {
-    baseLayers: {
-      maxZoom: 24,
-      attribution: '...'
-    },
+    baseLayers: [{
+      layer: {
+        maxNativeZoom: 22,
+        maxZoom: 24,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="http://opendatacommons.org/licenses/odbl/summary/">ODbL 1.0</a>, Other contents &copy; Swiss OpenStreetMap Association, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+      },
+      title: 'Swiss Open Street Map',
+      url: 'https://tile.osm.ch/osm-swiss-style/{z}/{x}/{y}.png'
+    }, {
+      layer: {
+        maxNativeZoom: 18,
+        maxZoom: 24,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+      },
+      title: 'Open Street Map',
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    }],
     initialZoom: 20,
+    maxZoom: 24,
     people: {
       enabled: true,
       femaleLayer: {

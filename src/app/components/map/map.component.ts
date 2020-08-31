@@ -36,16 +36,15 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
-    const baseLayers: Control.LayersObject = {
-      'Open Cycle Map': tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', environment.map.baseLayers),
-      'Open Street Map': tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', environment.map.baseLayers)
-    };
+    const baseLayers: Control.LayersObject = {};
+    environment.map.baseLayers.forEach(layerOptions => baseLayers[layerOptions.title] = tileLayer(layerOptions.url, layerOptions.layer));
     const mapOptions: MapOptions = {
+      center: environment.map.startLocation,
       layers: [
-        baseLayers['Open Cycle Map']
+        baseLayers[environment.map.baseLayers[0].title]
       ],
-      zoom: environment.map.initialZoom,
-      center: environment.map.startLocation
+      maxZoom: environment.map.maxZoom,
+      zoom: environment.map.initialZoom
     };
     this.layerUpdater = environment.production ? new LayerUpdater() : new PerformanceMeasuringLayerUpdater();
     const layerControl = control.layers(baseLayers, {});
