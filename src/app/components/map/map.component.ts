@@ -48,8 +48,8 @@ export class MapComponent implements OnDestroy, OnInit {
     };
     this.layerUpdater = environment.production ? new LayerUpdater() : new PerformanceMeasuringLayerUpdater();
     const layerControl = control.layers(baseLayers, {});
-    this.addLayer(mapOptions, layerControl, environment.map.people, () => new PeopleLayerManager());
-    this.addLayer(mapOptions, layerControl, environment.map.trails, () => new TrailLayerManager());
+    this.addLayer(mapOptions, layerControl, environment.map.people, (options) => new PeopleLayerManager(options));
+    this.addLayer(mapOptions, layerControl, environment.map.trails, (options) => new TrailLayerManager(options));
     map(this.mapElement.nativeElement, mapOptions)
       .addControl(layerControl)
       .addControl(control.scale());
@@ -57,13 +57,13 @@ export class MapComponent implements OnDestroy, OnInit {
     requestAnimationFrame(() => this.updatePeople());
   }
 
-  private addLayer<TLayerManager extends LayerManagerBase>(
+  private addLayer<TLayerManager extends LayerManagerBase, TLayerOptions extends ILayerManagerOptions<any>>(
     mapOptions: MapOptions,
     layerControl: Control.Layers,
-    options: ILayerManagerOptions<any>,
-    creator: () => TLayerManager): void {
+    options: TLayerOptions,
+    creator: (options: TLayerOptions) => TLayerManager): void {
     if (options.enabled) {
-      const manager = this.layerUpdater.addManager(creator());
+      const manager = this.layerUpdater.addManager(creator(options));
       if (options.initialVisible) {
         mapOptions.layers.push(manager.layers);
       }

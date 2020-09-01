@@ -2,9 +2,9 @@ import { LayerManagerGenericBase } from './layer-manager-generic-base';
 import { Circle, CircleMarkerOptions, circle } from 'leaflet';
 import { IPerson } from '../interfaces/iperson';
 import { Gender } from '../enums/gender.enum';
-import { environment } from '../../environments/environment';
+import { ILayerManagerOptions } from '../interfaces/ilayer-manager-options';
 
-export class PeopleLayerManager extends LayerManagerGenericBase<Circle> {
+export class PeopleLayerManager extends LayerManagerGenericBase<Circle, ILayerManagerOptions<CircleMarkerOptions>> {
 
     private static getPopupContent(person: IPerson): string {
         let genderText: string;
@@ -28,13 +28,13 @@ export class PeopleLayerManager extends LayerManagerGenericBase<Circle> {
         let options: CircleMarkerOptions;
         switch (person.gender) {
             case Gender.FEMALE:
-                options = environment.map.people.femaleLayer;
+                options = this.options.femaleLayer;
                 break;
             case Gender.MALE:
-                options = environment.map.people.maleLayer;
+                options = this.options.maleLayer;
                 break;
             default:
-                options = environment.map.people.otherLayer;
+                options = this.options.otherLayer;
                 break;
         }
         const dot = circle(person.location, options);
