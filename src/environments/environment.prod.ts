@@ -21,7 +21,7 @@ export const environment: IEnvironment = {
     }],
     initialZoom: 20,
     maxZoom: 24,
-    people: {
+    dots: {
       enabled: true,
       femaleLayer: {
         radius: 0.25,

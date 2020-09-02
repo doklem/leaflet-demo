@@ -1,10 +1,10 @@
 import { LatLng, latLng, Polyline, polyline, PolylineOptions } from 'leaflet';
-import { LayerManagerGenericBase } from './layer-manager-generic-base';
-import { IPerson } from '../interfaces/iperson';
-import { Gender } from '../enums/gender.enum';
-import { ITrailLayerManagerOptions } from '../interfaces/itrail-layer-manager-options';
+import { IPerson } from '../../interfaces/iperson';
+import { Gender } from '../../enums/gender.enum';
+import { ITrailsLayerOptions } from '../../interfaces/itrails-layer-options';
+import { PeopleLayerBase } from './people-layer-base';
 
-export class TrailLayerManager extends LayerManagerGenericBase<Polyline, ITrailLayerManagerOptions> {
+export class TrailsLayer extends PeopleLayerBase<Polyline, ITrailsLayerOptions> {
 
     public addPerson(person: IPerson): void {
         const locationLatLng = latLng(person.location);
@@ -21,7 +21,7 @@ export class TrailLayerManager extends LayerManagerGenericBase<Polyline, ITrailL
                 break;
         }
         const line = polyline([locationLatLng.clone(), locationLatLng.clone()], options);
-        this.layers.addLayer(line);
+        this.addLayer(line);
         this.lookUp.set(person.id, line);
     }
 
@@ -48,7 +48,7 @@ export class TrailLayerManager extends LayerManagerGenericBase<Polyline, ITrailL
         if (line === undefined) {
             return;
         }
-        this.layers.removeLayer(line);
+        this.removeLayer(line);
         line.remove();
         this.lookUp.delete(personId);
     }

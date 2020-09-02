@@ -1,10 +1,10 @@
-import { LayerManagerGenericBase } from './layer-manager-generic-base';
 import { Circle, CircleMarkerOptions, circle } from 'leaflet';
-import { IPerson } from '../interfaces/iperson';
-import { Gender } from '../enums/gender.enum';
-import { ILayerManagerOptions } from '../interfaces/ilayer-manager-options';
+import { IPerson } from '../../interfaces/iperson';
+import { PeopleLayerBase } from './people-layer-base';
+import { IPeopleLayerOptions } from '../../interfaces/ipeople-layer-options';
+import { Gender } from '../../enums/gender.enum';
 
-export class PeopleLayerManager extends LayerManagerGenericBase<Circle, ILayerManagerOptions<CircleMarkerOptions>> {
+export class DotsLayer extends PeopleLayerBase<Circle, IPeopleLayerOptions<CircleMarkerOptions>>  {
 
     private static getPopupContent(person: IPerson): string {
         let genderText: string;
@@ -38,8 +38,8 @@ export class PeopleLayerManager extends LayerManagerGenericBase<Circle, ILayerMa
                 break;
         }
         const dot = circle(person.location, options);
-        dot.bindPopup(PeopleLayerManager.getPopupContent(person));
-        this.layers.addLayer(dot);
+        dot.bindPopup(DotsLayer.getPopupContent(person));
+        this.addLayer(dot);
         this.lookUp.set(person.id, dot);
     }
 
@@ -61,7 +61,7 @@ export class PeopleLayerManager extends LayerManagerGenericBase<Circle, ILayerMa
         }
         dot.closePopup();
         dot.unbindPopup();
-        this.layers.removeLayer(dot);
+        this.removeLayer(dot);
         dot.remove();
         this.lookUp.delete(personId);
     }

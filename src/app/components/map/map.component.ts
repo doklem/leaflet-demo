@@ -4,12 +4,12 @@ import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
 import { IPerson } from '../../interfaces/iperson';
-import { PeopleLayerManager } from '../../classes/people-layer-manager';
-import { TrailLayerManager } from '../../classes/trail-layer-manager';
-import { LayerUpdater } from '../../classes/layer-updater';
-import { PerformanceMeasuringLayerUpdater } from '../../classes/performance-measuring-layer-updater';
-import { LayerManagerBase } from '../../classes/layer-manager-base';
-import { ILayerManagerOptions } from 'src/app/interfaces/ilayer-manager-options';
+import { PeopleLayerUpdater } from '../../classes/people-layer-updater';
+import { PerformanceMeasuringPeopleLayerUpdater } from '../../classes/performance-measuring-people-layer-updater';
+import { IPeopleLayerOptions } from '../../interfaces/ipeople-layer-options';
+import { PeopleLayerBase } from '../../classes/layers/people-layer-base';
+import { DotsLayer } from '../../classes/layers/dots-layer';
+import { TrailsLayer } from '../../classes/layers/trails-layer';
 
 @Component({
   selector: 'app-map',
@@ -18,7 +18,7 @@ import { ILayerManagerOptions } from 'src/app/interfaces/ilayer-manager-options'
 })
 export class MapComponent implements OnDestroy, OnInit {
 
-  private layerUpdater: LayerUpdater;
+  private layerUpdater: PeopleLayerUpdater;
   private peopleBuffer: Array<IPerson>;
   private peopleSubscription: Subscription;
 
@@ -46,10 +46,10 @@ export class MapComponent implements OnDestroy, OnInit {
       maxZoom: environment.map.maxZoom,
       zoom: environment.map.initialZoom
     };
-    this.layerUpdater = environment.production ? new LayerUpdater() : new PerformanceMeasuringLayerUpdater();
+    this.layerUpdater = environment.production ? new PeopleLayerUpdater() : new PerformanceMeasuringPeopleLayerUpdater();
     const layerControl = control.layers(baseLayers, {});
-    this.addLayer(mapOptions, layerControl, environment.map.people, (options) => new PeopleLayerManager(options));
-    this.addLayer(mapOptions, layerControl, environment.map.trails, (options) => new TrailLayerManager(options));
+    this.addLayer(mapOptions, layerControl, environment.map.dots, (options) => new DotsLayer(options));
+    this.addLayer(mapOptions, layerControl, environment.map.trails, (options) => new TrailsLayer(options));
     map(this.mapElement.nativeElement, mapOptions)
       .addControl(layerControl)
       .addControl(control.scale());
@@ -57,17 +57,17 @@ export class MapComponent implements OnDestroy, OnInit {
     requestAnimationFrame(() => this.updatePeople());
   }
 
-  private addLayer<TLayerManager extends LayerManagerBase, TLayerOptions extends ILayerManagerOptions<any>>(
+  private addLayer<TLayer extends PeopleLayerBase<any, any>, TLayerOptions extends IPeopleLayerOptions<any>>(
     mapOptions: MapOptions,
     layerControl: Control.Layers,
     options: TLayerOptions,
-    creator: (options: TLayerOptions) => TLayerManager): void {
+    creator: (options: TLayerOptions) => TLayer): void {
     if (options.enabled) {
-      const manager = this.layerUpdater.addManager(creator(options));
+      const layer = this.layerUpdater.addLayerGroup(creator(options));
       if (options.initialVisible) {
-        mapOptions.layers.push(manager.layers);
+        mapOptions.layers.push(layer);
       }
-      layerControl.addOverlay(manager.layers, options.title);
+      layerControl.addOverlay(layer, options.title);
     }
   }
 

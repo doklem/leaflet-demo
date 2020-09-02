@@ -1,6 +1,6 @@
 import { LayerOptions } from 'leaflet';
 
-export interface ILayerManagerOptions<TLayerOptions extends LayerOptions> {
+export interface IPeopleLayerOptions<TLayerOptions extends LayerOptions> extends LayerOptions {
     enabled: boolean;
     femaleLayer: TLayerOptions;
     initialVisible: boolean;
