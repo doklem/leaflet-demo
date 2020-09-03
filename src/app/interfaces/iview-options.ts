@@ -1,14 +1,11 @@
-import { CircleMarkerOptions } from 'leaflet';
-import { ILocation } from './ilocation';
+import { CircleMarkerOptions, MapOptions } from 'leaflet';
 import { ITrailsLayerOptions } from './itrails-layer-options';
 import { IPeopleLayerOptions } from './ipeople-layer-options';
 import { IBaseLayerOptions } from './ibase-layer-options';
 
-export interface IMapComponentOptions {
+export interface IViewOptions {
     baseLayers: Array<IBaseLayerOptions>;
-    initialZoom: number;
-    maxZoom: number;
     dots: IPeopleLayerOptions<CircleMarkerOptions>;
-    startLocation: ILocation;
+    map: MapOptions;
     trails: ITrailsLayerOptions;
 }

@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Control, control, map, MapOptions, tileLayer } from 'leaflet';
+import { canvas, Control, control, Layer, Map, map, tileLayer, MapOptions } from 'leaflet';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
@@ -36,38 +36,38 @@ export class MapComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
-    const baseLayers: Control.LayersObject = {};
-    environment.map.baseLayers.forEach(layerOptions => baseLayers[layerOptions.title] = tileLayer(layerOptions.url, layerOptions.layer));
-    const mapOptions: MapOptions = {
-      center: environment.map.startLocation,
-      layers: [
-        baseLayers[environment.map.baseLayers[0].title]
-      ],
-      maxZoom: environment.map.maxZoom,
-      zoom: environment.map.initialZoom
-    };
-    this.layerUpdater = environment.production ? new PeopleLayerUpdater() : new PerformanceMeasuringPeopleLayerUpdater();
-    const layerControl = control.layers(baseLayers, {});
-    this.addLayer(mapOptions, layerControl, environment.map.dots, (options) => new DotsLayer(options));
-    this.addLayer(mapOptions, layerControl, environment.map.trails, (options) => new TrailsLayer(options));
-    map(this.mapElement.nativeElement, mapOptions)
+    const layerControl = control.layers();
+    const mapOptionsClone: MapOptions = JSON.parse(JSON.stringify(environment.view.map));
+    mapOptionsClone.renderer = canvas();
+    const peopleMap = map(this.mapElement.nativeElement, mapOptionsClone)
       .addControl(layerControl)
       .addControl(control.scale());
+    let baseLayer: Layer;
+    environment.view.baseLayers.forEach((layerOptions, index) => {
+      baseLayer = tileLayer(layerOptions.url, layerOptions.layer);
+      layerControl.addBaseLayer(baseLayer, layerOptions.title);
+      if (index === 0) {
+        peopleMap.addLayer(baseLayer);
+      }
+    });
+    this.layerUpdater = environment.production ? new PeopleLayerUpdater() : new PerformanceMeasuringPeopleLayerUpdater();
+    this.addPeopleLayer(peopleMap, layerControl, environment.view.dots, (options) => new DotsLayer(options));
+    this.addPeopleLayer(peopleMap, layerControl, environment.view.trails, (options) => new TrailsLayer(options));
     this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
     requestAnimationFrame(() => this.updatePeople());
   }
 
-  private addLayer<TLayer extends PeopleLayerBase<any, any>, TLayerOptions extends IPeopleLayerOptions<any>>(
-    mapOptions: MapOptions,
+  private addPeopleLayer<TLayer extends PeopleLayerBase<any, any>, TLayerOptions extends IPeopleLayerOptions<any>>(
+    peopleMap: Map,
     layerControl: Control.Layers,
     options: TLayerOptions,
     creator: (options: TLayerOptions) => TLayer): void {
     if (options.enabled) {
       const layer = this.layerUpdater.addLayerGroup(creator(options));
-      if (options.initialVisible) {
-        mapOptions.layers.push(layer);
-      }
       layerControl.addOverlay(layer, options.title);
+      if (options.initialVisible) {
+        peopleMap.addLayer(layer);
+      }
     }
   }
 

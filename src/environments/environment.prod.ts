@@ -1,7 +1,8 @@
 import { IEnvironment } from './../app/interfaces/ienvironment';
 
 export const environment: IEnvironment = {
-  map: {
+  production: true,
+  view: {
     baseLayers: [{
       layer: {
         maxNativeZoom: 22,
@@ -19,8 +20,14 @@ export const environment: IEnvironment = {
       title: 'Open Street Map',
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     }],
-    initialZoom: 20,
-    maxZoom: 24,
+    map: {
+      center: {
+        lat: 46.949,
+        lng: 7.4393
+      },
+      maxZoom: 24,
+      zoom: 20
+    },
     dots: {
       enabled: true,
       femaleLayer: {
@@ -44,10 +51,6 @@ export const environment: IEnvironment = {
       },
       title: 'People'
     },
-    startLocation: {
-      lat: 46.949,
-      lng: 7.4393
-    },
     trails: {
       enabled: true,
       femaleLayer: {
@@ -70,7 +73,6 @@ export const environment: IEnvironment = {
       title: 'Trails'
     }
   },
-  production: true,
   worker:
   {
     moveDelay: 100,
