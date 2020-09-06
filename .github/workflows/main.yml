@@ -1,5 +1,4 @@
 name: CI
-
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
@@ -7,7 +6,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -17,7 +15,6 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v2
@@ -28,8 +25,6 @@ jobs:
         with:
           # Github access token token used to deploy on gh_pages. You can find it on Github.
           github_access_token: ${{ secrets.TOKEN }}
-          # The directory of the angular project, in which all the commands will run
-          angular_project_dir: "" # optional, default is ./
           # base href for the app
           base_href: "" # optional, default is /
           # The folder in which `ng build` provides its output. This is the folder which will be deployed to the `deploy_branch`.
