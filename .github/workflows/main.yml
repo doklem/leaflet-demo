@@ -32,3 +32,5 @@ jobs:
           angular_project_dir: "" # optional, default is ./
           # base href for the app
           base_href: "" # optional, default is /
+          # The folder in which `ng build` provides its output. This is the folder which will be deployed to the `deploy_branch`.
+          angular_dist_build_folder: "dist/leaflet-demo/" # optional, default is dist
