@@ -1,5 +1,7 @@
 # Leaflet
 
+[![Leaflet-demo Actions Status](https://github.com/doklem/leaflet-demo/workflows/Build/badge.svg)](https://github.com/doklem/leaflet-demo/actions)
+
 > Leaflet is the leading open-source JavaScript library for mobile-friendly interactive maps.
 
 [Live demo](https://doklem.github.io/leaflet-demo/)
