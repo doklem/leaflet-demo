@@ -1,10 +1,8 @@
 import { LayerOptions } from 'leaflet';
+import { IOverlayOptions } from './ioverlay-options';
 
-export interface IPeopleLayerOptions<TLayerOptions extends LayerOptions> extends LayerOptions {
-    enabled: boolean;
+export interface IPeopleLayerOptions<TLayerOptions extends LayerOptions> extends IOverlayOptions {
     femaleLayer: TLayerOptions;
-    initialVisible: boolean;
     maleLayer: TLayerOptions;
     otherLayer: TLayerOptions;
-    title: string;
 }

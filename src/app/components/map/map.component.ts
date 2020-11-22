@@ -1,8 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { canvas, Control, control, Layer, Map, map, tileLayer, MapOptions } from 'leaflet';
+import { canvas, Control, control, Layer, Map, map, MapOptions, LeafletMouseEvent, tileLayer } from 'leaflet';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
+import { WalkwayService } from '../../services/walkway.service';
 import { IPerson } from '../../interfaces/iperson';
 import { PeopleLayerUpdater } from '../../classes/people-layer-updater';
 import { PerformanceMeasuringPeopleLayerUpdater } from '../../classes/performance-measuring-people-layer-updater';
@@ -10,6 +11,8 @@ import { IPeopleLayerOptions } from '../../interfaces/ipeople-layer-options';
 import { PeopleLayerBase } from '../../classes/layers/people-layer-base';
 import { DotsLayer } from '../../classes/layers/dots-layer';
 import { TrailsLayer } from '../../classes/layers/trails-layer';
+import { WaypointsLayer } from '../../classes/layers/waypoints-layer';
+import { WalkwaysLayer } from '../../classes/layers/walkways-layer';
 
 @Component({
   selector: 'app-map',
@@ -25,8 +28,14 @@ export class MapComponent implements OnDestroy, OnInit {
   @ViewChild('map', { static: true })
   public mapElement: ElementRef<HTMLDivElement>;
 
-  constructor(private peopleService: PeopleService) {
+  constructor(
+    private readonly peopleService: PeopleService,
+    private readonly walkwayService: WalkwayService) {
     this.peopleBuffer = null;
+  }
+
+  private static logClick(e: LeafletMouseEvent): void {
+    console.log('location: { lat: ' + e.latlng.lat.toFixed(5) + ', lng: ' + e.latlng.lng.toFixed(5) + ' },');
   }
 
   public ngOnDestroy(): void {
@@ -54,6 +63,28 @@ export class MapComponent implements OnDestroy, OnInit {
     this.addPeopleLayer(peopleMap, layerControl, environment.view.dots, (options) => new DotsLayer(options));
     this.addPeopleLayer(peopleMap, layerControl, environment.view.trails, (options) => new TrailsLayer(options));
     this.peopleSubscription = this.peopleService.people$.subscribe(people => this.peopleBuffer = people);
+
+    if (environment.view.waypoints.enabled) {
+      const waypointsLayer = new WaypointsLayer(environment.view.waypoints);
+      waypointsLayer.setWaypoints(environment.worker.waypoints);
+      layerControl.addOverlay(waypointsLayer, environment.view.waypoints.title);
+      if (environment.view.waypoints.initialVisible) {
+        peopleMap.addLayer(waypointsLayer);
+      }
+    }
+    if (environment.view.walkways.enabled) {
+      const walkwaysLayer = new WalkwaysLayer(environment.view.walkways);
+      walkwaysLayer.setWalkways(this.walkwayService.walkways);
+      layerControl.addOverlay(walkwaysLayer, environment.view.walkways.title);
+      if (environment.view.walkways.initialVisible) {
+        peopleMap.addLayer(walkwaysLayer);
+      }
+    }
+
+    if (environment.production !== true) {
+      peopleMap.on('click', (e: LeafletMouseEvent) => MapComponent.logClick(e));
+    }
+
     requestAnimationFrame(() => this.updatePeople());
   }
 

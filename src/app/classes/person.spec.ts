@@ -1,9 +1,10 @@
 import { Person } from './person';
 import { Gender } from '../enums/gender.enum';
 import { PersonState } from '../enums/person-state.enum';
+import FastVector from 'fast-vector';
 
 describe('Person', () => {
-  const person = new Person(0, 0, Gender.OTHER, 0, { lat: 0, lng: 0 }, true, 0);
+  const person = new Person(0, 0, [new FastVector(0, 0), new FastVector(1, 1)], Gender.OTHER, 1);
   it('should create an instance', () => {
     expect(person).toBeTruthy();
   });

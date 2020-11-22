@@ -25,7 +25,7 @@ export class PeopleSerializer {
                 people.push({
                     state,
                     id: view.getUint32(index),
-                    eta: view.getFloat64(index + 4),
+                    depatureTime: view.getFloat64(index + 4),
                     gender: view.getUint8(index + 12),
                     location: {
                         lat: view.getFloat64(index + 13),
@@ -56,7 +56,7 @@ export class PeopleSerializer {
             view.setUint32(index, person.id);
             index += 4;
             if (person.state !== PersonState.REMOVED) {
-                view.setFloat64(index, person.eta);
+                view.setFloat64(index, person.depatureTime);
                 index += 8;
                 view.setUint8(index, person.gender);
                 index++;

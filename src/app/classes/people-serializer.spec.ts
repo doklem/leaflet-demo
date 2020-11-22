@@ -11,7 +11,7 @@ describe('PersonSerializer', () => {
       peopleAll.push({
         id: idCounter++,
         state,
-        eta: idCounter * 345.3409834,
+        depatureTime: idCounter * 345.3409834,
         gender,
         location: {
           lat: idCounter * 9874.12314,
@@ -62,16 +62,16 @@ describe('PersonSerializer', () => {
     }
   });
 
-  it('should serialize the ETA of living people', () => {
+  it('should serialize the depature time of living people', () => {
     for (let i = 0; i < peopleAlife.length; i++) {
-      expect(serializedPeopleAlife[i].eta)
-        .toBe(peopleAlife[i].eta);
+      expect(serializedPeopleAlife[i].depatureTime)
+        .toBe(peopleAlife[i].depatureTime);
     }
   });
 
-  it('should not serialize the ETA of deleted people', () => {
+  it('should not serialize the depature time of deleted people', () => {
     for (let i = 0; i < peopleDeleted.length; i++) {
-      expect(serializedPeopleDeleted[i].eta)
+      expect(serializedPeopleDeleted[i].depatureTime)
         .toBeUndefined();
     }
   });

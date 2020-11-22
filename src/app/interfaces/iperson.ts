@@ -3,7 +3,7 @@ import { ILocation } from './ilocation';
 import { PersonState } from '../enums/person-state.enum';
 
 export interface IPerson {
-    readonly eta?: number;
+    readonly depatureTime?: number;
     readonly gender?: Gender;
     readonly id: number;
     readonly location?: ILocation;

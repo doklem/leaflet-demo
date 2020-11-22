@@ -20,8 +20,8 @@ export class DotsLayer extends PeopleLayerBase<Circle, IPeopleLayerOptions<Circl
                 break;
         }
         return `<div><b>Id</b> ${person.id}</div>
-      <div><b>Gender</b> ${genderText}</div>
-      <div><b>ETA</b> ${new Date(person.eta).toLocaleTimeString()}</div>`;
+        <div><b>Gender</b> ${genderText}</div>
+        <div><b>Depature</b> ${new Date(person.depatureTime).toLocaleTimeString()}</div>`;
     }
 
     public addPerson(person: IPerson): void {
