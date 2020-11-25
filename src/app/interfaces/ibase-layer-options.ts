@@ -1,7 +1,7 @@
-import { TileLayerOptions } from 'leaflet';
+import { TileLayerOptions, WMSOptions } from 'leaflet';
 
 export interface IBaseLayerOptions {
-    layer: TileLayerOptions;
+    layer: TileLayerOptions | WMSOptions;
     title: string;
     url: string;
 }

@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { canvas, Control, control, Layer, Map, map, MapOptions, LeafletMouseEvent, tileLayer } from 'leaflet';
+import { canvas, Control, control, Map, map, MapOptions, LeafletMouseEvent, tileLayer, TileLayer } from 'leaflet';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PeopleService } from '../../services/people.service';
@@ -51,9 +51,13 @@ export class MapComponent implements OnDestroy, OnInit {
     const peopleMap = map(this.mapElement.nativeElement, mapOptionsClone)
       .addControl(layerControl)
       .addControl(control.scale());
-    let baseLayer: Layer;
+    let baseLayer: TileLayer;
     environment.view.baseLayers.forEach((layerOptions, index) => {
-      baseLayer = tileLayer(layerOptions.url, layerOptions.layer);
+      if ('layers' in layerOptions.layer) {
+        baseLayer = new TileLayer.WMS(layerOptions.url, layerOptions.layer);
+      } else {
+        baseLayer = tileLayer(layerOptions.url, layerOptions.layer);
+      }
       layerControl.addBaseLayer(baseLayer, layerOptions.title);
       if (index === 0) {
         peopleMap.addLayer(baseLayer);

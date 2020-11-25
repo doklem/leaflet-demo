@@ -13,6 +13,24 @@ export const environment: IEnvironment = {
       url: 'https://tile.osm.ch/osm-swiss-style/{z}/{x}/{y}.png'
     }, {
       layer: {
+        layers: 'luftbild_2020',
+        maxNativeZoom: 20,
+        maxZoom: 24,
+        attribution: '&copy; <a href="https://www.bern.ch/open-government-data-ogd">Geodaten Stadt Bern</a>'
+      },
+      title: 'Satellite',
+      url: 'https://map.bern.ch/wms/OpenData/proxy.php?'
+    }, {
+      layer: {
+        layers: 'GEODB.LDOM50CM_LORELIEF_STANDARD',
+        maxNativeZoom: 20,
+        maxZoom: 24,
+        attribution: '&copy; <a href="https://www.be.ch/geoportal">Amt für Geoinformation des Kantons Bern</a>'
+      },
+      title: 'LIDAR',
+      url: 'https://www.geoservice.apps.be.ch/geoservice2/services/a42geo/a42geo_hoehenwms_d_fk/MapServer/WMSServer?'
+    }, {
+      layer: {
         maxNativeZoom: 18,
         maxZoom: 24,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
@@ -168,15 +186,47 @@ export const environment: IEnvironment = {
         connections: ['Baldachin, underground, north']
       },
       {
+        id: 'passage east, escalator A, heigh',
+        entranceGroup: 'passage east',
+        location: { lat: 46.94920, lng: 7.44082 },
+        radius: 0.5,
+        connections: ['passage east, escalator A, low']
+      },
+      {
+        id: 'passage east, escalator A, low',
+        location: { lat: 46.94918, lng: 7.44071 },
+        radius: 0.5,
+        connections: ['passage east']
+      },
+      {
         id: 'passage east, stairs, heigh',
         entranceGroup: 'passage east',
-        location: { lat: 46.94918, lng: 7.44084 },
-        radius: 5,
+        location: { lat: 46.94918, lng: 7.44083 },
+        radius: 1.5,
         connections: ['passage east, stairs, low']
       },
       {
         id: 'passage east, stairs, low',
-        location: { lat: 46.94914, lng: 7.44067 },
+        location: { lat: 46.94916, lng: 7.44072 },
+        radius: 1.5,
+        connections: ['passage east']
+      },
+      {
+        id: 'passage east, escalator B, heigh',
+        entranceGroup: 'passage east',
+        location: { lat: 46.94917, lng: 7.44084 },
+        radius: 0.5,
+        connections: ['passage east, escalator B, low']
+      },
+      {
+        id: 'passage east, escalator B, low',
+        location: { lat: 46.94915, lng: 7.44072 },
+        radius: 0.5,
+        connections: ['passage east']
+      },
+      {
+        id: 'passage east',
+        location: { lat: 46.94915, lng: 7.44064 },
         radius: 5,
         connections: ['mainbuilding, passage east']
       },
@@ -190,90 +240,111 @@ export const environment: IEnvironment = {
         id: 'mainbuilding, Baldachin entrance',
         location: { lat: 46.94838, lng: 7.44016 },
         radius: 10,
-        connections: [
-          'mainbuilding, escalators, southeast',
-          'mainbuilding, escalators, southwest'
-        ]
-      },
-      {
-        id: 'mainbuilding, escalators, southeast',
-        location: { lat: 46.94870, lng: 7.44022 },
-        radius: 5,
-        connections: ['mainbuilding, escalators, northeast']
-      },
-      {
-        id: 'mainbuilding, escalators, northeast',
-        location: { lat: 46.94888, lng: 7.44014 },
-        radius: 5,
-        connections: [
-          'mainbuilding, central court',
-          'mainbuilding, entrance south, escalators low'
-        ]
-      },
-      {
-        id: 'mainbuilding, escalators, southwest',
-        location: { lat: 46.94864, lng: 7.43988 },
-        radius: 5,
-        connections: ['mainbuilding, escalators, northwest']
-      },
-      {
-        id: 'mainbuilding, escalators, northwest',
-        location: { lat: 46.94883, lng: 7.43982 },
-        radius: 5,
-        connections: [
-          'mainbuilding, central court',
-          'mainbuilding, entrance south, escalators low'
-        ]
-      },
-      {
-        id: 'mainbuilding, entrance north',
-        entranceGroup: 'mainbuilding',
-        location: { lat: 46.94922, lng: 7.43986 },
-        radius: 5,
         connections: ['mainbuilding, central court']
       },
       {
-        id: 'mainbuilding, entrance northeast',
+        id: 'mainbuilding, entrance north, escalator A, heigh',
         entranceGroup: 'mainbuilding',
-        location: { lat: 46.94922, lng: 7.44021 },
-        radius: 5,
+        location: { lat: 46.94916, lng: 7.43989 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance north, escalator A, low']
+      },
+      {
+        id: 'mainbuilding, entrance north, escalator A, low',
+        location: { lat: 46.94907, lng: 7.43992 },
+        radius: 0.5,
         connections: ['mainbuilding, central court']
       },
       {
-        id: 'mainbuilding, entrance east',
+        id: 'mainbuilding, entrance north, escalator B, heigh',
         entranceGroup: 'mainbuilding',
-        location: { lat: 46.94891, lng: 7.44031 },
-        radius: 5,
-        connections: ['mainbuilding, escalators, northeast']
+        location: { lat: 46.94917, lng: 7.43987 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance north, escalator B, low']
       },
       {
-        id: 'mainbuilding, entrance west',
-        entranceGroup: 'mainbuilding',
-        location: { lat: 46.94876, lng: 7.43969 },
-        radius: 5,
-        connections: [
-          'mainbuilding, escalators, southwest',
-          'mainbuilding, escalators, northwest'
-        ]
-      },
-      {
-        id: 'mainbuilding, entrance south, escalators low',
-        location: { lat: 46.94885, lng: 7.43998 },
-        radius: 8,
+        id: 'mainbuilding, entrance north, escalator B, low',
+        location: { lat: 46.94907, lng: 7.43990 },
+        radius: 0.5,
         connections: ['mainbuilding, central court']
       },
       {
-        id: 'mainbuilding, entrance south, escalators heigh',
-        location: { lat: 46.94868, lng: 7.44005 },
-        radius: 8,
-        connections: ['mainbuilding, entrance south, escalators low']
+        id: 'mainbuilding, entrance south, escalator A, low',
+        location: { lat: 46.94884, lng: 7.44008 },
+        radius: 0.5,
+        connections: ['mainbuilding, central court']
       },
       {
-        id: 'mainbuilding, entrance south',
+        id: 'mainbuilding, entrance south, escalator A, heigh',
         entranceGroup: 'mainbuilding',
-        location: { lat: 46.94858, lng: 7.44008 },
-        radius: 8,
-        connections: ['mainbuilding, entrance south, escalators heigh']
+        location: { lat: 46.94871, lng: 7.44014 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance south, escalator A, low']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator B, low',
+        location: { lat: 46.94884, lng: 7.44006 },
+        radius: 0.5,
+        connections: ['mainbuilding, central court']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator B, heigh',
+        entranceGroup: 'mainbuilding',
+        location: { lat: 46.94871, lng: 7.44011 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance south, escalator B, low']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator C, low',
+        location: { lat: 46.94882, lng: 7.43992 },
+        radius: 0.5,
+        connections: ['mainbuilding, central court']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator C, heigh',
+        entranceGroup: 'mainbuilding',
+        location: { lat: 46.94868, lng: 7.43997 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance south, escalator C, low']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator D, low',
+        location: { lat: 46.94881, lng: 7.43990 },
+        radius: 0.5,
+        connections: ['mainbuilding, central court']
+      },
+      {
+        id: 'mainbuilding, entrance south, escalator D, heigh',
+        entranceGroup: 'mainbuilding',
+        location: { lat: 46.94868, lng: 7.43995 },
+        radius: 0.5,
+        connections: ['mainbuilding, entrance south, escalator D, low']
+      },
+      {
+        id: 'mainbuilding, entrance south, stairs A, low',
+        location: { lat: 46.94883, lng: 7.44002 },
+        radius: 1,
+        connections: ['mainbuilding, central court']
+      },
+      {
+        id: 'mainbuilding, entrance south, stairs A, heigh',
+        entranceGroup: 'mainbuilding',
+        location: { lat: 46.94870, lng: 7.44007 },
+        radius: 1,
+        connections: ['mainbuilding, entrance south, stairs A, low']
+      },
+      {
+        id: 'mainbuilding, entrance south, stairs B, low',
+        location: { lat: 46.94882, lng: 7.43997 },
+        radius: 1,
+        connections: ['mainbuilding, central court']
+      },
+      {
+        id: 'mainbuilding, entrance south, stairs B, heigh',
+        entranceGroup: 'mainbuilding',
+        location: { lat: 46.94869, lng: 7.44002 },
+        radius: 1,
+        connections: ['mainbuilding, entrance south, stairs B, low']
       },
       {
         id: 'mainbuilding, central court',
@@ -288,10 +359,7 @@ export const environment: IEnvironment = {
           lng: 7.43965
         },
         radius: 7,
-        connections: [
-          'passage west, curve',
-          'mainbuilding, escalators, northwest'
-        ]
+        connections: ['passage west, curve']
       },
       {
         id: 'passage west, curve',
